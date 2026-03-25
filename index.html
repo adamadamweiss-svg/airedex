@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIREDEX™ — AI Readiness Index</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #0D1B2A;
+    --navy2:  #162437;
+    --gold:   #C9A84C;
+    --gold2:  #E8C96A;
+    --ice:    #E8F0F7;
+    --dim:    #8BA3BA;
+    --slate:  #7A96B0;
+    --green:  #2ECC71;
+    --amber:  #F39C12;
+    --red:    #E74C3C;
+    --blue:   #3498DB;
+    --border-dark: rgba(201,168,76,0.2);
+    --border-light: rgba(255,255,255,0.08);
+    --card-light: #13202F;
+    --bg-light: #0D1B2A;
+    --text-primary: #E8F0F7;
+    --text-secondary: #8BA3BA;
+    --text-tertiary: #4A6580;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Syne', sans-serif; min-height: 100vh;
+    background: var(--navy);
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -5%, rgba(201,168,76,0.07) 0%, transparent 65%),
+      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,0.015) 59px, rgba(255,255,255,0.015) 60px),
+      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.015) 59px, rgba(255,255,255,0.015) 60px);
+  }
+
+  /* ── QUOTE BANNER ── */
+  .quote-banner {
+    background: var(--navy);
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    padding: 11px 48px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px;
+  }
+  .quote-mark {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px; color: var(--gold); line-height: 1;
+    opacity: 0.6; flex-shrink: 0;
+  }
+  .quote-text {
+    font-family: 'Instrument Serif', serif;
+    font-size: 14px; color: var(--ice);
+    font-style: italic; line-height: 1.4;
+  }
+  .quote-text strong { font-style: normal; color: var(--gold2); font-weight: 400; }
+  .quote-attr {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; color: var(--dim);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .quote-divider {
+    width: 1px; height: 24px;
+    background: rgba(201,168,76,0.25); flex-shrink: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 48px;
+    background: rgba(13,27,42,0.96);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-dark);
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 34px; height: 34px;
+    border: 1.5px solid var(--gold); border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 12px; color: var(--gold);
+    letter-spacing: -0.5px;
+  }
+  .logo-text {
+    font-weight: 700; font-size: 14px;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--ice);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .beta-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; padding: 2px 6px;
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 3px; color: var(--gold);
+    background: rgba(201,168,76,0.08);
+    letter-spacing: 0.08em;
+  }
+  .logo-sub {
+    font-size: 9px; color: var(--dim);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em; margin-top: 1px;
+  }
+  nav { display: flex; gap: 28px; align-items: center; }
+  nav a {
+    font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--dim); text-decoration: none; transition: color 0.2s;
+  }
+  nav a:hover { color: var(--ice); }
+  .nav-cta {
+    font-size: 11px; padding: 8px 18px;
+    border: 1px solid var(--border-dark);
+    border-radius: 6px; color: var(--gold) !important;
+  }
+  .nav-cta:hover { background: rgba(201,168,76,0.1) !important; border-color: var(--gold) !important; }
+
+  /* ── DARK HERO ── */
+  .hero-section {
+    background: transparent;
+    padding: 72px 24px 80px;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after {
+    content: ''; display: block; width: 28px; height: 1px;
+    background: var(--gold); opacity: 0.4;
+  }
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(34px, 5.5vw, 60px);
+    line-height: 1.1; font-weight: 400; color: #fff;
+    max-width: 720px; margin: 0 auto 18px;
+  }
+  .hero h1 em { font-style: italic; color: var(--gold2); }
+  .hero-sub {
+    font-size: 14px; color: var(--dim); line-height: 1.7;
+    max-width: 460px; margin: 0 auto 44px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── SCORE MY SCHOOL INPUT ── */
+  .score-container {
+    max-width: 580px; margin: 0 auto;
+  }
+  .score-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 10px; text-align: left;
+  }
+  .score-box {
+    display: flex;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .score-box:focus-within {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+  }
+  .score-box input {
+    flex: 1; padding: 16px 20px;
+    background: transparent; border: none; outline: none;
+    font-family: 'Syne', sans-serif; font-size: 15px; color: var(--ice);
+  }
+  .score-box input::placeholder { color: var(--slate); }
+  .score-box button {
+    padding: 12px 28px; margin: 6px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border: none; border-radius: 8px; cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--navy); transition: opacity 0.2s; white-space: nowrap;
+  }
+  .score-box button:hover { opacity: 0.9; }
+
+  /* ── LIGHT CARDS SECTION ── */
+  .cards-section {
+    background: transparent;
+    padding: 56px 24px 64px;
+  }
+  .section-inner { max-width: 1080px; margin: 0 auto; }
+  .section-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 20px; padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .section-title {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: 0.02em; color: var(--ice);
+  }
+  .section-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; color: var(--dim);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .tab {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 6px 14px; border-radius: 5px; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--dim); background: transparent;
+    transition: all 0.15s;
+  }
+  .tab:hover { border-color: var(--border-dark); color: var(--ice); }
+  .tab.active {
+    background: rgba(201,168,76,0.12);
+    border-color: var(--gold); color: var(--gold);
+  }
+
+  /* ── CARDS GRID ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 16px;
+  }
+
+  /* ── SCHOOL CARD (light) ── */
+  .school-card {
+    background: var(--navy2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px; overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s;
+    cursor: pointer;
+  }
+  .school-card:hover {
+    border-color: var(--border-dark);
+    transform: translateY(-2px);
+  }
+  .card-top {
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+  }
+  .school-name {
+    font-size: 14px; font-weight: 700;
+    color: #fff; line-height: 1.3;
+  }
+  .gem-flag { font-size: 9px; color: var(--gold); margin-left: 5px; }
+
+  .tier-label-inline {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+  .tier-s-label { color: #F1C40F; }
+  .tier-a-label { color: #2ECC71; }
+  .tier-b-label { color: #3498DB; }
+  .tier-c-label { color: #F39C12; }
+  .tier-d-label { color: #E74C3C; }
+
+  .card-body { padding: 14px 18px 16px; }
+
+  .score-row {
+    display: flex; align-items: baseline; gap: 5px; margin-bottom: 12px;
+  }
+  .score-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 38px; color: var(--gold); line-height: 1;
+  }
+  .score-denom {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; color: var(--dim);
+  }
+
+  .card-headline {
+    font-size: 11px; color: var(--dim);
+    line-height: 1.5; margin-bottom: 14px;
+    font-family: 'DM Mono', monospace;
+    border-left: 2px solid rgba(255,255,255,0.1);
+    padding-left: 10px;
+  }
+
+  .pillars { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+  .pillar-row { display: flex; align-items: center; gap: 8px; }
+  .pillar-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--dim); width: 76px; flex-shrink: 0;
+  }
+  .pillar-track {
+    flex: 1; height: 5px;
+    background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;
+  }
+  .pillar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+  .fill-strong { background: var(--green); box-shadow: 0 0 6px rgba(46,204,113,0.4); }
+  .fill-mid    { background: var(--amber); box-shadow: 0 0 6px rgba(243,156,18,0.4); }
+  .fill-weak   { background: var(--red);   box-shadow: 0 0 6px rgba(231,76,60,0.4); }
+  .pillar-pts {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px; color: var(--dim);
+    width: 30px; text-align: right;
+  }
+
+  .attitude-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .attitude-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--dim); width: 76px; flex-shrink: 0;
+  }
+  .attitude-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; padding: 2px 8px; border-radius: 3px;
+  }
+  .att-enabling    { background: rgba(46,204,113,0.12); color: #2ECC71; }
+  .att-permissive  { background: rgba(243,156,18,0.12); color: #F39C12; }
+  .att-neutral     { background: rgba(139,163,186,0.1); color: var(--dim); }
+  .att-restrictive { background: rgba(231,76,60,0.12); color: var(--red); }
+
+  .sources-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    padding-top: 10px; margin-top: 6px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .source-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; color: var(--gold);
+    text-decoration: none; opacity: 0.8;
+  }
+  .source-chip:hover { opacity: 1; }
+
+  /* ── REQUEST CARD ── */
+  .request-card {
+    background: var(--navy2);
+    border: 1.5px dashed rgba(201,168,76,0.25);
+    border-radius: 14px; padding: 24px 20px;
+    display: flex; flex-direction: column;
+    align-items: stretch; justify-content: center;
+  }
+  .request-card h3 {
+    font-size: 14px; font-weight: 700;
+    color: var(--ice); margin-bottom: 4px;
+  }
+  .request-card p {
+    font-size: 11px; color: var(--dim);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 16px; line-height: 1.6;
+  }
+  .req-input {
+    width: 100%; padding: 9px 12px; margin-bottom: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 7px; font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ice); outline: none;
+    transition: border-color 0.2s;
+  }
+  .req-input::placeholder { color: var(--slate); }
+  .req-input:focus { border-color: var(--gold); }
+  .req-select {
+    width: 100%; padding: 9px 12px; margin-bottom: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 7px; font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--dim); outline: none;
+  }
+  .req-btn {
+    width: 100%; padding: 10px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border: none; border-radius: 7px; cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--navy); transition: opacity 0.2s;
+  }
+  .req-btn:hover { opacity: 0.88; }
+
+  /* ── CTA SECTION ── */
+  .cta-section {
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    padding: 64px 24px;
+    background-image: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(201,168,76,0.06) 0%, transparent 70%);
+  }
+  .cta-inner {
+    max-width: 900px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  }
+  .cta-card {
+    background: var(--navy2);
+    border: 1px solid var(--border-dark);
+    border-radius: 16px; padding: 32px 28px;
+  }
+  .cta-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 12px;
+  }
+  .cta-card h3 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px; font-weight: 400; color: #fff;
+    line-height: 1.2; margin-bottom: 10px;
+  }
+  .cta-card h3 em { font-style: italic; color: var(--gold2); }
+  .cta-card p {
+    font-size: 12px; color: var(--dim);
+    font-family: 'DM Mono', monospace;
+    line-height: 1.7; margin-bottom: 20px;
+  }
+  .cta-input-row { display: flex; gap: 8px; }
+  .cta-input {
+    flex: 1; padding: 11px 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px; font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ice); outline: none;
+    transition: border-color 0.2s;
+  }
+  .cta-input::placeholder { color: var(--slate); }
+  .cta-input:focus { border-color: var(--gold); }
+  .cta-btn {
+    padding: 11px 20px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border: none; border-radius: 8px; cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--navy); white-space: nowrap; transition: opacity 0.2s;
+  }
+  .cta-btn:hover { opacity: 0.9; }
+  .cta-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; color: var(--slate); margin-top: 10px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 24px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; color: var(--slate); letter-spacing: 0.05em;
+  }
+  footer a { color: var(--slate); text-decoration: none; }
+  footer a:hover { color: var(--dim); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-section { animation: fadeUp 0.5s ease both; }
+  .school-card:nth-child(1) { animation: fadeUp 0.4s 0.05s ease both; }
+  .school-card:nth-child(2) { animation: fadeUp 0.4s 0.12s ease both; }
+  .school-card:nth-child(3) { animation: fadeUp 0.4s 0.19s ease both; }
+  .school-card:nth-child(4) { animation: fadeUp 0.4s 0.26s ease both; }
+  .school-card:nth-child(5) { animation: fadeUp 0.4s 0.33s ease both; }
+
+  @media (max-width: 700px) {
+    .quote-banner { padding: 10px 16px; flex-wrap: wrap; gap: 8px; }
+    .quote-divider { display: none; }
+    header { padding: 14px 20px; }
+    nav { display: none; }
+    .hero-section { padding: 48px 16px 56px; }
+    .cards-section { padding: 40px 16px 48px; }
+    .cta-inner { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- QUOTE BANNER -->
+<div class="quote-banner">
+  <span class="quote-mark">"</span>
+  <span class="quote-text">AI could displace <strong>half of all entry-level white collar jobs</strong> in the next 1–5 years.</span>
+  <div class="quote-divider"></div>
+  <span class="quote-attr">Dario Amodei, CEO · Anthropic · Jan 2026</span>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">AI</div>
+    <div>
+      <div class="logo-text">AIREDEX™ <span class="beta-badge">BETA</span></div>
+      <div class="logo-sub">AI Readiness Index</div>
+    </div>
+  </div>
+  <nav>
+    <a href="#">Lists</a>
+    <a href="#">Methodology</a>
+    
+  </nav>
+</header>
+
+<!-- DARK HERO -->
+<div class="hero-section">
+  <div class="hero-eyebrow">AI Readiness Index</div>
+  <div class="hero" style="max-width:760px;margin:0 auto;text-align:center">
+    <h1>Will your College or University<br>prepare you for the <em>AI revolution?</em></h1>
+    <p class="hero-sub">An independent scoring system powered by proprietary research and AI analysis.</p>
+
+    <div class="score-container">
+      <div class="score-label">Find My School</div>
+      <div class="score-box">
+        <input type="text" placeholder="UCLA" id="searchInput" />
+        <button onclick="handleSearch()">Go</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHT CARDS SECTION -->
+<div class="cards-section">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-title">Best Overall, AI Readiness</div>
+      <div class="section-meta">Research date: March 2026</div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="setTab(this)">Best Overall</div>
+      <div class="tab" onclick="setTab(this)">Universities</div>
+      <div class="tab" onclick="setTab(this)">Colleges</div>
+      <div class="tab" onclick="setTab(this)">Regional Schools</div>
+      <div class="tab" onclick="setTab(this)">Hidden Gems</div>
+    </div>
+
+    <div class="cards-grid">
+
+      <!-- MIT -->
+      <div class="school-card">
+        <div class="card-top">
+          <div>
+            <div class="school-name">Massachusetts Inst. of Technology</div>
+            <div class="tier-label-inline tier-s-label">S Tier</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="score-row">
+            <div class="score-num">94</div>
+            <div class="score-denom">/100</div>
+          </div>
+          <div class="card-headline">World-leading AI infrastructure with deep industry integration and cross-disciplinary curriculum.</div>
+          <div class="pillars">
+            <div class="pillar-row"><span class="pillar-name">Commitment</span><div class="pillar-track"><div class="pillar-fill fill-strong" style="width:96%"></div></div><span class="pillar-pts">26/27</span></div>
+            <div class="pillar-row"><span class="pillar-name">Curriculum</span><div class="pillar-track"><div class="pillar-fill fill-strong" style="width:90%"></div></div><span class="pillar-pts">27/30</span></div>
+            <div class="pillar-row"><span class="pillar-name">Partnerships</span><div class="pillar-track"><div class="pillar-fill fill-strong" style="width:95%"></div></div><span class="pillar-pts">19/20</span></div>
+            <div class="pillar-row"><span class="pillar-name">Research</span><div class="pillar-track"><div class="pillar-fill fill-strong" style="width:100%"></div></div><span class="pillar-pts">16/16</span></div>
+            <div class="attitude-row">
+              <span class="attitude-name">A(I)ttitude</span>
+              <span class="attitude-chip att-enabling">Enabling · 7/7</span>
+            </div>
+          </div>
+          <div class="sources-row">
+            <a class="source-chip" href="#">↗ MIT AI Policy · Jan 2026</a>
+            <a class="source-chip" href="#">↗ MIT-IBM Watson Lab</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bowdoin -->
+      <div class="school-card">
+        <div class="card-top">
+          <div>
+            <div class="school-name">Bowdoin College <span class="gem-flag">✦</span></div>
+            <div class="tier-label-inline tier-s-label">S Tier</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="score-row">
+            <div class="score-num">88</div>
+            <div class="score-denom">/100</div>
+          </div>
+          <div class="card-headline">Exceptional AI curriculum depth, outperforms many research universities on student-facing readiness.</div>
+          <div class="pillars">
+            <div class="pillar-row"><span class="pillar-name">Commitment</span><div class="pillar-track"><div class="pillar-fill fill-strong" style="width:87%"></div></div><span class="pillar-pts">26/30</span></div>
+            <div class="pillar-row"><span class="pillar-name">Curriculum</span><div class="pillar-track"><div class="pillar-fill fill-strong" style="width:90%"></div></div><span class="pillar-pts">36/40</span></div>
+            <div class="pillar-row"><span class="pillar-name">Partnerships</span><div class="pillar-track"><div class="pillar-fill fill-mid" style="width:67%"></div></div><span class="pillar-pts">8/12</span></div>
+            <div class="pillar-row"><span class="pillar-name">Research</span><div class="pillar-track"><div class="pillar-fill fill-mid" style="width:50%"></div></div><span class="pillar-pts">4/8</span></div>
+            <div class="attitude-row">
+              <span class="attitude-name">A(I)ttitude</span>
+              <span class="attitude-chip att-enabling">Enabling · 10/10</span>
+            </div>
+          </div>
+          <div class="sources-row">
+            <a class="source-chip" href="#">↗ Bowdoin AI Initiative · 2025</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Princeton -->
+      <div class="school-card">
+        <div class="card-top">
+          <div>
+            <div class="school-name">Princeton University</div>
+            <div class="tier-label-inline tier-a-label">A Tier</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="score-row">
+            <div class="score-num">78</div>
+            <div class="score-denom">/100</div>
+          </div>
+          <div class="card-headline">Strong industry partnerships and research depth, limited formal undergraduate AI curriculum.</div>
+          <div class="pillars">
+            <div class="pillar-row"><span class="pillar-name">Commitment</span><div class="pillar-track"><div class="pillar-fill fill-strong" style="width:85%"></div></div><span class="pillar-pts">23/27</span></div>
+            <div class="pillar-row"><span class="pillar-name">Curriculum</span><div class="pillar-track"><div class="pillar-fill fill-mid" style="width:50%"></div></div><span class="pillar-pts">15/30</span></div>
+            <div class="pillar-row"><span class="pillar-name">Partnerships</span><div class="pillar-track"><div class="pillar-fill fill-strong" style="width:85%"></div></div><span class="pillar-pts">17/20</span></div>
+            <div class="pillar-row"><span class="pillar-name">Research</span><div class="pillar-track"><div class="pillar-fill fill-strong" style="width:88%"></div></div><span class="pillar-pts">14/16</span></div>
+            <div class="attitude-row">
+              <span class="attitude-name">A(I)ttitude</span>
+              <span class="attitude-chip att-permissive">Permissive · 5/7</span>
+            </div>
+          </div>
+          <div class="sources-row">
+            <a class="source-chip" href="#">↗ SPIA AI Policy · Mar 2026</a>
+            <a class="source-chip" href="#">↗ NJ AI Hub · 2025</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Williams -->
+      <div class="school-card">
+        <div class="card-top">
+          <div>
+            <div class="school-name">Williams College</div>
+            <div class="tier-label-inline tier-b-label">B Tier</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="score-row">
+            <div class="score-num">61</div>
+            <div class="score-denom">/100</div>
+          </div>
+          <div class="card-headline">Active AI curriculum development underway, limited industry partnerships and formal AI commitment to date.</div>
+          <div class="pillars">
+            <div class="pillar-row"><span class="pillar-name">Commitment</span><div class="pillar-track"><div class="pillar-fill fill-mid" style="width:53%"></div></div><span class="pillar-pts">16/30</span></div>
+            <div class="pillar-row"><span class="pillar-name">Curriculum</span><div class="pillar-track"><div class="pillar-fill fill-mid" style="width:60%"></div></div><span class="pillar-pts">24/40</span></div>
+            <div class="pillar-row"><span class="pillar-name">Partnerships</span><div class="pillar-track"><div class="pillar-fill fill-weak" style="width:25%"></div></div><span class="pillar-pts">3/12</span></div>
+            <div class="pillar-row"><span class="pillar-name">Research</span><div class="pillar-track"><div class="pillar-fill fill-mid" style="width:50%"></div></div><span class="pillar-pts">4/8</span></div>
+            <div class="attitude-row">
+              <span class="attitude-name">A(I)ttitude</span>
+              <span class="attitude-chip att-neutral">Neutral · 4/10</span>
+            </div>
+          </div>
+          <div class="sources-row">
+            <a class="source-chip" href="#">↗ Williams CS Dept · 2025</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Request card -->
+      <div class="request-card">
+        <h3>Your school not here yet?</h3>
+        <p>Submit your school and we'll notify you when our team completes its analysis.</p>
+        <input class="req-input" type="text" placeholder="School name" />
+        <input class="req-input" type="email" placeholder="Your email" />
+        <select class="req-select">
+          <option value="" disabled selected>I am a...</option>
+          <option>Student</option>
+          <option>Parent</option>
+          <option>College counselor</option>
+          <option>School administrator</option>
+          <option>Other</option>
+        </select>
+        <button class="req-btn">Notify Me When Ready</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- CTA SECTION -->
+<div class="cta-section" id="counselors">
+  <div class="cta-inner">
+
+    <!-- Professional CTA -->
+    <div class="cta-card">
+      <div class="cta-eyebrow">For Professionals</div>
+      <h3>Counselors, consultants &<br><em>school administrators</em></h3>
+      <p>Full database access across all scored institutions. Complete pillar breakdowns, source citations, and school comparison, built for the professionals advising students and institutions.</p>
+      <div class="cta-input-row">
+        <input class="cta-input" type="email" placeholder="your@email.com" />
+        <button class="cta-btn">Inquire about plans and pricing</button>
+      </div>
+      <div class="cta-note">Professional plans available. We'll be in touch within 48 hours.</div>
+    </div>
+
+    <!-- General subscriber CTA -->
+    <div class="cta-card">
+      <div class="cta-eyebrow">Stay Informed</div>
+      <h3>The AI landscape in higher<br><em>education is moving fast</em></h3>
+      <p>Subscribe to receive AIREDEX updates, new school scores, annual AI Readiness Reports, and insights on how universities are responding to the AI revolution.</p>
+      <div class="cta-input-row">
+        <input class="cta-input" type="email" placeholder="your@email.com" />
+        <button class="cta-btn">Subscribe</button>
+      </div>
+      <div class="cta-note">No spam. Unsubscribe anytime.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div style="display:flex;flex-direction:column;gap:4px"><div>© 2026 AIREDEX™ · AI Readiness Index · All rights reserved.</div><div style="font-size:9px;opacity:0.6">AIREDEX™ scores are independent assessments based on publicly available information. No institution has paid for or influenced its score.</div></div>
+  <div style="display:flex;gap:24px">
+    <a href="#">Methodology</a>
+    <a href="#">For Consultants</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+<script>
+function handleSearch() {
+  const val = document.getElementById('searchInput').value.trim();
+  if (!val) return;
+  const schools = ['Massachusetts','MIT','Bowdoin','Princeton','Williams'];
+  const match = schools.find(s => val.toLowerCase().includes(s.toLowerCase()));
+  if (match) {
+    alert('Found a match in our database.\n\nIn the live product this would display the full school score card.');
+  } else {
+    document.querySelector('.request-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => document.querySelector('.req-input').focus(), 600);
+  }
+}
+
+document.getElementById('searchInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') handleSearch();
+});
+
+function setTab(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>
