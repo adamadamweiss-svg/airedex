@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIREDEX™ — AI Readiness Index</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #0D1B2A;
+    --navy2:  #162437;
+    --gold:   #C9A84C;
+    --gold2:  #E8C96A;
+    --ice:    #E8F0F7;
+    --dim:    #8BA3BA;
+    --slate:  #7A96B0;
+    --green:  #2ECC71;
+    --amber:  #F39C12;
+    --red:    #E74C3C;
+    --border-dark: rgba(201,168,76,0.2);
+    --border-light: rgba(255,255,255,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Syne', sans-serif; min-height: 100vh;
+    background: var(--navy);
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -5%, rgba(201,168,76,0.07) 0%, transparent 65%),
+      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,0.015) 59px, rgba(255,255,255,0.015) 60px),
+      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.015) 59px, rgba(255,255,255,0.015) 60px);
+  }
+
+  /* QUOTE BANNER */
+  .quote-banner {
+    background: var(--navy);
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    padding: 11px 48px;
+    display: flex; align-items: center; justify-content: center; gap: 16px;
+  }
+  .quote-mark { font-family: 'Instrument Serif', serif; font-size: 32px; color: var(--gold); line-height: 1; opacity: 0.6; flex-shrink: 0; }
+  .quote-text { font-family: 'Instrument Serif', serif; font-size: 14px; color: var(--ice); font-style: italic; line-height: 1.4; }
+  .quote-text strong { font-style: normal; color: var(--gold2); font-weight: 400; }
+  .quote-attr { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+  .quote-divider { width: 1px; height: 24px; background: rgba(201,168,76,0.25); flex-shrink: 0; }
+
+  /* HEADER */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 48px;
+    background: rgba(13,27,42,0.96); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-dark);
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-mark { width: 34px; height: 34px; border: 1.5px solid var(--gold); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: var(--gold); letter-spacing: -0.5px; }
+  .logo-text { font-weight: 700; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ice); display: flex; align-items: center; gap: 8px; }
+  .beta-badge { font-family: 'DM Mono', monospace; font-size: 9px; padding: 2px 6px; border: 1px solid rgba(201,168,76,0.35); border-radius: 3px; color: var(--gold); background: rgba(201,168,76,0.08); letter-spacing: 0.08em; }
+  .logo-sub { font-size: 9px; color: var(--dim); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; margin-top: 1px; }
+  nav { display: flex; gap: 28px; align-items: center; }
+  nav a { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); text-decoration: none; transition: color 0.2s; }
+  nav a:hover { color: var(--ice); }
+  .nav-coming-soon { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(139,163,186,0.35); cursor: default; display: flex; align-items: center; gap: 6px; }
+  .nav-cs-badge { font-family: 'DM Mono', monospace; font-size: 8px; padding: 1px 5px; border: 1px solid rgba(139,163,186,0.2); border-radius: 3px; color: rgba(139,163,186,0.35); letter-spacing: 0.08em; }
+
+  /* HERO */
+  .hero-section { background: transparent; padding: 72px 24px 56px; text-align: center; animation: fadeUp 0.5s ease both; }
+  .hero-eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .hero-eyebrow::before, .hero-eyebrow::after { content: ''; display: block; width: 28px; height: 1px; background: var(--gold); opacity: 0.4; }
+  .hero h1 { font-family: 'Instrument Serif', serif; font-size: clamp(34px, 5.5vw, 60px); line-height: 1.1; font-weight: 400; color: #fff; max-width: 760px; margin: 0 auto 18px; }
+  .hero h1 em { font-style: italic; color: var(--gold2); }
+  .hero-sub { font-size: 13px; color: var(--ice); line-height: 1.7; max-width: 520px; margin: 0 auto; font-family: 'DM Mono', monospace; }
+
+  /* EXPLAINER */
+  .explainer-section { padding: 48px 24px 56px; }
+  .explainer-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .explainer-card { background: var(--navy2); border: 1px solid var(--border-dark); border-radius: 16px; padding: 28px; }
+  .explainer-eyebrow { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+  .explainer-card h3 { font-family: 'Instrument Serif', serif; font-size: 20px; font-weight: 400; color: #fff; line-height: 1.2; margin-bottom: 12px; }
+  .explainer-card h3 em { font-style: italic; color: var(--gold2); }
+  .explainer-card p { font-size: 12px; color: var(--ice); font-family: 'DM Mono', monospace; line-height: 1.8; }
+
+  /* CARDS SECTION */
+  .cards-section { background: transparent; padding: 0 24px 64px; }
+  .section-inner { max-width: 1080px; margin: 0 auto; }
+  .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .section-title { font-size: 18px; font-weight: 700; letter-spacing: 0.02em; color: var(--ice); }
+  .section-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; }
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+  .filter-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; margin-right: 4px; }
+  .filter-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 14px; border-radius: 5px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); color: var(--dim); background: transparent; transition: all 0.15s; }
+  .filter-btn:hover { border-color: var(--border-dark); color: var(--ice); }
+  .filter-btn.active { background: rgba(201,168,76,0.12); border-color: var(--gold); color: var(--gold); }
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+
+  /* SCHOOL CARD */
+  .school-card { background: var(--navy2); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; overflow: hidden; transition: border-color 0.2s, transform 0.15s; cursor: pointer; }
+  .school-card:hover { border-color: var(--border-dark); transform: translateY(-2px); }
+  .school-card.highlighted { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,0.2); }
+  .card-top { padding: 16px 18px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .card-top-left { flex: 1; }
+  .school-name { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.3; }
+  .school-meta { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--slate); letter-spacing: 0.06em; margin-top: 3px; }
+  .tier-label-inline { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.08em; margin-top: 4px; }
+  .tier-s-label { color: #F1C40F; } .tier-a-label { color: #2ECC71; } .tier-b-label { color: #3498DB; } .tier-c-label { color: #F39C12; } .tier-d-label { color: #E74C3C; }
+  .rank-badges { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; flex-shrink: 0; }
+  .rank-badge-ai { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--gold); background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.25); border-radius: 6px; padding: 4px 10px; white-space: nowrap; letter-spacing: 0.01em; }
+  .rank-badge-app { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--dim); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 3px 7px; white-space: nowrap; text-align: right; }
+  .card-body { padding: 14px 18px 16px; }
+  .score-row { display: flex; align-items: baseline; gap: 5px; margin-bottom: 12px; }
+  .score-num { font-family: 'Instrument Serif', serif; font-size: 38px; color: #fff; line-height: 1; }
+  .score-denom { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--dim); }
+  .card-headline { font-size: 11px; color: var(--ice); line-height: 1.5; margin-bottom: 14px; font-family: 'DM Mono', monospace; border-left: 2px solid rgba(255,255,255,0.15); padding-left: 10px; }
+  .pillars { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+  .pillar-row { display: flex; align-items: center; gap: 8px; }
+  .pillar-name { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); width: 76px; flex-shrink: 0; }
+  .pillar-track { flex: 1; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+  .pillar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+  .fill-strong { background: var(--green); box-shadow: 0 0 6px rgba(46,204,113,0.4); }
+  .fill-mid    { background: var(--amber); box-shadow: 0 0 6px rgba(243,156,18,0.4); }
+  .fill-weak   { background: var(--red);   box-shadow: 0 0 6px rgba(231,76,60,0.4); }
+  .pillar-pts { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--dim); width: 30px; text-align: right; }
+  .attitude-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .attitude-name { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); width: 76px; flex-shrink: 0; }
+  .attitude-chip { font-family: 'DM Mono', monospace; font-size: 9px; padding: 2px 8px; border-radius: 3px; }
+  .att-enabling    { background: rgba(46,204,113,0.12); color: #2ECC71; }
+  .att-permissive  { background: rgba(243,156,18,0.12); color: #F39C12; }
+  .att-neutral     { background: rgba(139,163,186,0.1); color: var(--dim); }
+  .att-restrictive { background: rgba(231,76,60,0.12); color: var(--red); }
+  .sources-row { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 10px; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.06); }
+  .source-chip { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--gold); text-decoration: none; opacity: 0.8; }
+  .source-chip:hover { opacity: 1; }
+
+  /* LEARN MORE BUTTON */
+  .learn-more-btn {
+    display: block; width: 100%; text-align: center;
+    margin-top: 14px;
+    font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--navy); background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border: none; border-radius: 7px; padding: 10px 14px; cursor: pointer; transition: opacity 0.2s;
+  }
+  .learn-more-btn:hover { opacity: 0.88; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 500;
+    background: rgba(8,18,30,0.82); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--navy2); border: 1px solid var(--border-dark);
+    border-radius: 18px; max-width: 600px; width: 100%;
+    max-height: 80vh; overflow-y: auto;
+    padding: 32px 32px 28px; position: relative;
+    animation: fadeUp 0.2s ease both;
+  }
+  .modal-close { position: absolute; top: 16px; right: 16px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--dim); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; padding: 4px 10px; cursor: pointer; transition: color 0.15s; }
+  .modal-close:hover { color: var(--ice); }
+  .modal-school-name { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--slate); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  .modal-section-title { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; margin-top: 20px; }
+  .modal-section-title:first-of-type { margin-top: 0; }
+  .modal-highlights { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .modal-highlights li { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ice); line-height: 1.5; padding-left: 18px; position: relative; }
+  .modal-highlights li::before { content: '\2713'; position: absolute; left: 0; color: var(--green); font-size: 10px; }
+  .modal-evidence { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ice); line-height: 1.8; }
+  .modal-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 18px 0; }
+
+  /* REQUEST CARD */
+  .request-card { background: var(--navy2); border: 1.5px dashed rgba(201,168,76,0.25); border-radius: 14px; padding: 24px 20px; display: flex; flex-direction: column; align-items: stretch; justify-content: center; }
+  .request-card h3 { font-size: 14px; font-weight: 700; color: var(--ice); margin-bottom: 4px; }
+  .request-card p { font-size: 11px; color: var(--ice); font-family: 'DM Mono', monospace; margin-bottom: 16px; line-height: 1.6; }
+  .req-input { width: 100%; padding: 9px 12px; margin-bottom: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 7px; font-size: 12px; font-family: 'DM Mono', monospace; color: var(--ice); outline: none; transition: border-color 0.2s; }
+  .req-input::placeholder { color: var(--slate); }
+  .req-input:focus { border-color: var(--gold); }
+  .req-select { width: 100%; padding: 9px 12px; margin-bottom: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 7px; font-size: 12px; font-family: 'DM Mono', monospace; color: var(--dim); outline: none; }
+  .req-btn { width: 100%; padding: 10px; background: linear-gradient(135deg, var(--gold), var(--gold2)); border: none; border-radius: 7px; cursor: pointer; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--navy); transition: opacity 0.2s; }
+  .req-btn:hover { opacity: 0.88; }
+
+  /* CTA */
+  .cta-section { padding: 64px 24px; background: rgba(13,27,42,0.6); border-top: 1px solid var(--border-dark); }
+  .cta-inner { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+  .cta-card { background: var(--navy2); border: 1px solid var(--border-dark); border-radius: 16px; padding: 32px 28px; }
+  .cta-eyebrow { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+  .cta-card h3 { font-family: 'Instrument Serif', serif; font-size: 22px; font-weight: 400; color: #fff; line-height: 1.2; margin-bottom: 10px; }
+  .cta-card h3 em { font-style: italic; color: var(--gold2); }
+  .cta-card p { font-size: 12px; color: var(--ice); font-family: 'DM Mono', monospace; line-height: 1.7; margin-bottom: 20px; }
+  .cta-input-row { display: flex; gap: 8px; }
+  .cta-input { flex: 1; padding: 11px 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; font-size: 12px; font-family: 'DM Mono', monospace; color: var(--ice); outline: none; transition: border-color 0.2s; }
+  .cta-input::placeholder { color: var(--slate); }
+  .cta-input:focus { border-color: var(--gold); }
+  .cta-btn { padding: 11px 20px; background: linear-gradient(135deg, var(--gold), var(--gold2)); border: none; border-radius: 8px; cursor: pointer; font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--navy); white-space: nowrap; transition: opacity 0.2s; }
+  .cta-btn:hover { opacity: 0.9; }
+  .cta-note { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--slate); margin-top: 10px; }
+
+  /* FOOTER */
+  footer { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.06); padding: 24px 48px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--slate); letter-spacing: 0.05em; }
+  .footer-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 32px; margin-bottom: 16px; }
+  .footer-legal { display: flex; flex-direction: column; gap: 6px; max-width: 680px; }
+  .footer-legal div { font-size: 9px; line-height: 1.6; opacity: 0.7; }
+  .footer-nav { display: flex; gap: 24px; flex-shrink: 0; }
+  .footer-copy { border-top: 1px solid rgba(255,255,255,0.04); padding-top: 14px; font-size: 9px; opacity: 0.5; }
+  footer a { color: var(--slate); text-decoration: none; }
+  footer a:hover { color: var(--dim); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-section { animation: fadeUp 0.5s ease both; }
+
+  @media (max-width: 900px) {
+    .cta-inner { grid-template-columns: 1fr; }
+    .explainer-inner { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 700px) {
+    .quote-banner { padding: 10px 16px; flex-wrap: wrap; gap: 8px; }
+    .quote-divider { display: none; }
+    header { padding: 14px 20px; }
+    nav { display: none; }
+    .hero-section { padding: 48px 16px 40px; }
+    .cards-section { padding: 0 16px 48px; }
+    .footer-top { flex-direction: column; gap: 16px; }
+    footer { padding: 24px 20px; }
+    .modal-box { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" onclick="closeModal()">Close &#215;</button>
+    <div class="modal-school-name" id="modalSchoolName"></div>
+    <div class="modal-section-title">AI Highlights</div>
+    <ul class="modal-highlights" id="modalHighlights"></ul>
+    <div class="modal-divider"></div>
+    <div class="modal-section-title">Key Findings</div>
+    <p class="modal-evidence" id="modalEvidence"></p>
+  </div>
+</div>
+
+<div class="quote-banner">
+  <span class="quote-mark">&#8220;</span>
+  <span class="quote-text">AI could displace <strong>half of all entry-level white collar jobs</strong> in the next 1&#8211;5 years.&#8221;</span>
+  <div class="quote-divider"></div>
+  <span class="quote-attr">Dario Amodei, CEO &middot; Anthropic &middot; Jan 2026</span>
+</div>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">AI</div>
+    <div>
+      <div class="logo-text">AIREDEX&#8482; <span class="beta-badge">BETA</span></div>
+      <div class="logo-sub">AI Readiness Index</div>
+    </div>
+  </div>
+  <nav>
+    <span class="nav-coming-soon">Lists <span class="nav-cs-badge">Coming Soon</span></span>
+    <a href="airedex_methodology.html">Methodology</a>
+    <a href="mailto:press@airedex.com">Contact</a>
+  </nav>
+</header>
+
+<div class="hero-section">
+  <div class="hero-eyebrow">AI Readiness Index</div>
+  <div class="hero" style="max-width:760px;margin:0 auto;text-align:center">
+    <h1>These are America's Most-Applied-To Universities ranked by their <em>AI-Readiness</em></h1>
+    <p class="hero-sub">Powered by independent AIREDEX&#8482; research using proprietary AI analysis and scoring algorithms.</p>
+  </div>
+</div>
+
+<div class="explainer-section">
+  <div class="explainer-inner">
+    <div class="explainer-card">
+      <div class="explainer-eyebrow">What is AI Readiness?</div>
+      <h3>Measuring what matters <em>most</em> right now</h3>
+      <p>AI Readiness measures how seriously a college or university is preparing its students for a world where artificial intelligence is reshaping every industry and profession. Our proprietary research and algorithms have identified five key pillars that determine how well a school has adapted to the AI revolution, and by extension, how prepared its graduates will be for what comes next.</p>
+    </div>
+    <div class="explainer-card">
+      <div class="explainer-eyebrow">Why it Matters</div>
+      <h3>The stakes have never been <em>higher</em></h3>
+      <p>The gap between AI-ready graduates and everyone else is widening fast. Employers are already sorting for AI fluency. Students who graduate from institutions that have embedded AI into their curriculum, culture, and strategy will have a measurable advantage in hiring, in earnings, and in career trajectory. Where you go to school has always mattered. Now, how AI-ready that school is matters just as much.</p>
+    </div>
+  </div>
+</div>
+
+<div class="cards-section">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-title">Top 10 Most Applied-To Universities</div>
+      <div class="section-meta">As of March 2026 &middot; 10 Schools Scored</div>
+    </div>
+    <div class="filter-bar">
+      <span class="filter-label">Sort by</span>
+      <button class="filter-btn active" onclick="sortCards('ai', this)">AI Readiness Rank</button>
+      <button class="filter-btn" onclick="sortCards('app', this)">Applications Rank</button>
+    </div>
+    <div class="cards-grid" id="cardsGrid"></div>
+  </div>
+</div>
+
+<div class="cta-section" id="counselors">
+  <div class="cta-inner">
+    <div class="cta-card">
+      <div class="cta-eyebrow">For Professionals</div>
+      <h3>Counselors, consultants &amp;<br><em>school administrators</em></h3>
+      <p>Database access across all scored institutions, pillar breakdowns, source citations, and other tools built for the professionals advising students and institutions.</p>
+      <div class="cta-input-row">
+        <input class="cta-input" type="email" placeholder="your@email.com" />
+        <button class="cta-btn">Inquire about plans and pricing</button>
+      </div>
+      <div class="cta-note">We'll be in touch within 48 hours.</div>
+    </div>
+    <div class="cta-card">
+      <div class="cta-eyebrow">For Press &amp; Media</div>
+      <h3>Journalists &amp;<br><em>media organizations</em></h3>
+      <p>AIREDEX&#8482; is the first independent AI Readiness Index for American universities. We welcome press inquiries, interview requests, and data licensing conversations from journalists and media organizations covering higher education and artificial intelligence.</p>
+      <div class="cta-input-row">
+        <input class="cta-input" type="email" placeholder="your@email.com" />
+        <button class="cta-btn">Press Inquiry</button>
+      </div>
+      <div class="cta-note">We'll be in touch within 48 hours.</div>
+    </div>
+    <div class="cta-card">
+      <div class="cta-eyebrow">Stay Informed</div>
+      <h3>The AI landscape in higher<br><em>education is moving fast</em></h3>
+      <p>Subscribe to receive AIREDEX&#8482; updates, new school scores, annual AI Readiness Reports, and insights on how universities are responding to the AI revolution.</p>
+      <div class="cta-input-row">
+        <input class="cta-input" type="email" placeholder="your@email.com" />
+        <button class="cta-btn">Subscribe</button>
+      </div>
+      <div class="cta-note">No spam. Unsubscribe anytime.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-legal">
+      <div>AIREDEX&#8482; scores, rankings, tier designations, and methodology are proprietary. No score, ranking, or AIREDEX&#8482; designation may be reproduced, republished, or referenced in any commercial or institutional context without prior written permission. For licensing and press use, contact us at <a href="mailto:press@airedex.com">press@airedex.com</a>.</div>
+      <div>AIREDEX&#8482; scores are independent assessments based on publicly available information. No institution has paid for or influenced any score.</div>
+    </div>
+    <div class="footer-nav">
+      <a href="airedex_methodology.html">Methodology</a>
+      <a href="mailto:press@airedex.com">Contact</a>
+    </div>
+  </div>
+  <div class="footer-copy">&#169; 2026 AIREDEX&#8482; &middot; AI Readiness Index &middot; All rights reserved.</div>
+</footer>
+
+<script>
+const TIER_LABELS = {
+  S: "Elite AI Readiness",
+  A: "Exceptional AI Readiness",
+  B: "Strong AI Readiness",
+  C: "Good AI Readiness",
+  D: "Limited AI Readiness"
+};
+
+const ATTITUDE_LABELS = {
+  'enabling':    'Leading Edge',
+  'permissive':  'Progressive',
+  'neutral':     'Neutral',
+  'restrictive': 'Cautious',
+  'resistant':   'Resistant'
+};
+
+const SCHOOLS = [
+  {
+    aiRank:1, appRank:10, name:"University of Southern California", state:"CA", track:"R", total:78, tier:"A",
+    summary:"Strong AI Strategy Committee with emerging undergraduate programs but limited formal executive structure.",
+    p1:16,p1max:27, p2:22,p2max:30, p3:17,p3max:20, p4:16,p4max:16, p5:7,p5max:7, p5label:"Enabling",
+    searchDate:"March 2026",
+    highlights:[
+      "President's AI Strategy Committee formed Oct 2025",
+      "BS in Artificial Intelligence launching Fall 2026",
+      "AI for Business joint degree (Marshall+Viterbi) since 2023",
+      "ChatGPT Edu partnership announced Dec 2025",
+      "USC-Amazon Center on Secure and Trusted ML",
+      "USC-Meta Center for Research and Education in AI",
+      "Capital One CREDIF Center for Responsible AI",
+      "Knight Foundation $4M AI ethics initiative",
+      "Center for AI in Society (CAIS) since 2016",
+      "Multiple AI minors across schools",
+      "MS in CS (AI) — first of its kind in nation",
+      "New interdisciplinary PhD in AI and Operations Research"
+    ],
+    keyEvidence:"President's AI Strategy Committee led by Dean Geoff Garrett (Oct 2025), BS AI launching Fall 2026, ChatGPT Edu partnership, multiple industry-funded centers including Amazon, Meta, and Capital One.",
+    sources:[
+      {label:"president.usc.edu", url:"https://www.president.usc.edu/2025/10/06/announcing-uscs-ai-summit-and-ai-strategy-committee/"},
+      {label:"usc.edu", url:"https://www.usc.edu/ai/"},
+      {label:"viterbischool.usc.edu", url:"https://viterbischool.usc.edu/news/2025/08/usc-viterbi-school-of-engineering-and-the-usc-school-of-advanced-computing-launch-an-undergraduate-degree-in-artificial-intelligence/"}
+    ]
+  },
+  {
+    aiRank:2, appRank:2, name:"UC San Diego", state:"CA", track:"R", total:75, tier:"A",
+    summary:"Strong AI infrastructure with new undergraduate major and robust research ecosystem.",
+    p1:12,p1max:27, p2:27,p2max:30, p3:13,p3max:20, p4:16,p4max:16, p5:7,p5max:7, p5label:"Enabling",
+    searchDate:"March 2026",
+    highlights:[
+      "B.S. Artificial Intelligence major launched Fall 2025",
+      "Chief Health AI Officer appointed (Karandeep Singh)",
+      "TILOS NSF AI Research Institute ($220M)",
+      "School of Computing, Information and Data Sciences established 2024",
+      "MLSys Initiative launched 2024",
+      "NVIDIA DGX B200 system acquired",
+      "TritonGPT on-campus AI platform",
+      "Graduate MS and PhD in Data Science"
+    ],
+    keyEvidence:"B.S. AI major launched Fall 2025 with 200+ students. Karandeep Singh named inaugural Chief Health AI Officer. TILOS NSF AI Institute and MLSys Initiative confirmed. NVIDIA DGX B200 acquired for research.",
+    sources:[
+      {label:"today.ucsd.edu", url:"https://today.ucsd.edu/story/uc-san-diegos-new-ai-major-is-here"},
+      {label:"ucsd.edu", url:"https://ucsd.edu/research-innovation/artificial-intelligence.html"},
+      {label:"today.ucsd.edu", url:"https://today.ucsd.edu/story/uc-san-diego-machine-learning-initiative-aims-to-advance-ai-systems"}
+    ]
+  },
+  {
+    aiRank:3, appRank:8, name:"University of Michigan", state:"MI", track:"R", total:73, tier:"B",
+    summary:"Strong AI research infrastructure with OpenAI partnership, multiple minors, and industry ties.",
+    p1:18,p1max:27, p2:19,p2max:30, p3:17,p3max:20, p4:12,p4max:16, p5:7,p5max:7, p5label:"Enabling",
+    searchDate:"March 2026",
+    highlights:[
+      "AIIM launched March 2025 as institutional AI hub",
+      "OpenAI partnership announced 2025 with NextGenAI consortium",
+      "Two AI minors launched Winter 2026",
+      "Toyota Research Institute partnership since 2016",
+      "Ford Motor Company Robotics Building on campus",
+      "Vision 2034 strategic plan includes AI as core pillar",
+      "Generative AI Advisory Committee with named chair"
+    ],
+    keyEvidence:"AIIM launched March 2025, OpenAI partnership 2025 via NextGenAI consortium, two undergraduate AI minors launched Winter 2026 (CSE and UMSI Human-Centered AI). Strong Toyota and Ford industry partnerships.",
+    sources:[
+      {label:"record.umich.edu", url:"https://record.umich.edu/articles/aiim-summit-unites-leadership-to-chart-u-ms-ai-future/"},
+      {label:"record.umich.edu", url:"https://record.umich.edu/articles/u-m-openai-launch-partnership-to-expand-ai-research/"},
+      {label:"cse.engin.umich.edu", url:"https://cse.engin.umich.edu/academics/undergraduate/majors-and-minors/artificial-intelligence-minor/"}
+    ]
+  },
+  {
+    aiRank:4, appRank:9, name:"Northeastern University", state:"MA", track:"R", total:71, tier:"B",
+    summary:"Northeastern leads with $50M AI institute, Anthropic partnership, and 90+ faculty, but lacks undergraduate AI major.",
+    p1:18,p1max:27, p2:13,p2max:30, p3:17,p3max:20, p4:16,p4max:16, p5:7,p5max:7, p5label:"Enabling",
+    searchDate:"March 2026",
+    highlights:[
+      "Institute for Experiential AI with $50M funding (2019)",
+      "Anthropic partnership as first higher ed partner (April 2025)",
+      "Named AI executive: Javed Aslam serves as Chief of AI",
+      "90+ faculty members affiliated with AI Institute",
+      "MS in Artificial Intelligence with multiple concentrations",
+      "Interdisciplinary AI minor for undergraduates",
+      "AI Review Committee established (2025)",
+      "Strong industry partnerships: IBM, Microsoft, Amazon, Anthropic"
+    ],
+    keyEvidence:"Institute for Experiential AI launched 2019 with $50M commitment. Anthropic partnership April 2025 as first higher ed partner. MS AI and interdisciplinary minor available. Javed Aslam serves as Chief of AI.",
+    sources:[
+      {label:"ai.northeastern.edu", url:"https://ai.northeastern.edu/"},
+      {label:"news.northeastern.edu", url:"https://news.northeastern.edu/2025/04/02/anthropic-ai-partnership/"},
+      {label:"news.northeastern.edu", url:"https://news.northeastern.edu/2019/10/03/northeastern-university-launches-institute-for-experiential-artificial-intelligence/"}
+    ]
+  },
+  {
+    aiRank:5, appRank:1, name:"UCLA", state:"CA", track:"R", total:61, tier:"B",
+    summary:"Strong institutional AI commitment with named CDAIO and OpenAI partnership, limited undergraduate AI-specific curriculum.",
+    p1:18,p1max:27, p2:9,p2max:30, p3:17,p3max:20, p4:12,p4max:16, p5:5,p5max:7, p5label:"Permissive",
+    searchDate:"March 2026",
+    highlights:[
+      "Chris Mattmann appointed Chief Data and AI Officer 2024",
+      "OpenAI partnership announced September 2024 — first UC campus",
+      "AI Innovation Initiative with 68 pilot projects across 27 departments",
+      "Amazon Science Hub partnership with $1M annual funding",
+      "Break Through Tech AI program hosted at UCLA",
+      "Advisory Committee on AI in Teaching and Learning (Spring 2025)",
+      "Graduate AI programs (MS/PhD in CS, MEng AI concentration)"
+    ],
+    keyEvidence:"Chris Mattmann appointed Chief Data and AI Officer in 2024. OpenAI partnership September 2024 as first UC campus. AI Innovation Initiative spans 68 pilot projects across 27 departments. Amazon Science Hub confirmed.",
+    sources:[
+      {label:"fortune.com", url:"https://fortune.com/2025/09/03/college-university-chief-ai-officer-ucla-university-of-utah/"},
+      {label:"dts.ucla.edu", url:"https://dts.ucla.edu/initiatives/ai/governance"},
+      {label:"newsroom.ucla.edu", url:"https://newsroom.ucla.edu/releases/ucla-advisory-committee-artificial-intelligence-opportunities-challenges-learning"}
+    ]
+  },
+  {
+    aiRank:6, appRank:7, name:"New York University", state:"NY", track:"R", total:61, tier:"B",
+    summary:"World-class AI research with major gaps in undergraduate curriculum integration.",
+    p1:18,p1max:27, p2:9,p2max:30, p3:13,p3max:20, p4:16,p4max:16, p5:5,p5max:7, p5label:"Permissive",
+    searchDate:"March 2026",
+    highlights:[
+      "AI Leadership Council with institutional governance structure",
+      "AI Center of Excellence launched for operational AI deployment",
+      "DeepMind partnership funding Pathways to AI undergraduate program",
+      "Global AI Frontier Lab with Korean government partnership",
+      "Yann LeCun (Turing Award winner) leading AI research",
+      "MS in Business Analytics and AI at Stern",
+      "November 2025: Courant Institute elevated to full school status",
+      "Google Gemini and NotebookLM provided university-wide"
+    ],
+    keyEvidence:"AI Leadership Council established for governance. DeepMind partnership active via Pathways to AI program. Global AI Frontier Lab with Korean government. Courant Institute elevated to full school November 2025. Yann LeCun leading world-class AI research.",
+    sources:[
+      {label:"nyu.edu", url:"https://www.nyu.edu/life/information-technology/artificial-intelligence-at-nyu/governance.html"},
+      {label:"nyu.edu", url:"https://www.nyu.edu/life/information-technology/artificial-intelligence-at-nyu/coe.html"},
+      {label:"cims.nyu.edu", url:"https://cims.nyu.edu/dynamic/news/1416/"}
+    ]
+  },
+  {
+    aiRank:7, appRank:4, name:"UC Irvine", state:"CA", track:"R", total:50, tier:"C",
+    summary:"UCI has strong AI leadership and infrastructure with ZotGPT and AISI, but lacks undergraduate AI major.",
+    p1:12,p1max:27, p2:8,p2max:30, p3:13,p3max:20, p4:12,p4max:16, p5:5,p5max:7, p5label:"Permissive",
+    searchDate:"March 2026",
+    highlights:[
+      "ZotGPT free AI platform launched April 2024",
+      "Sarkis Daglian named Director of AI",
+      "AISI (AI in Science Institute) led by Pierre Baldi",
+      "UC systemwide AWS partnership",
+      "Center for Machine Learning and Intelligent Systems active",
+      "Master of Applied AI for Science launching Fall 2026",
+      "$6M Geophysicist.AI project 2025"
+    ],
+    keyEvidence:"Sarkis Daglian is Director of AI. ZotGPT platform launched April 2024. AISI led by Pierre Baldi confirmed. Master of Applied AI for Science launching Fall 2026.",
+    sources:[
+      {label:"zotgpt.uci.edu", url:"https://zotgpt.uci.edu/"},
+      {label:"uctechnews.ucop.edu", url:"https://uctechnews.ucop.edu/interview-uc-irvine-launches-zotgpt-classchat-for-students/"},
+      {label:"research.uci.edu", url:"https://research.uci.edu/center/artificial-intelligence-in-science-institute/"}
+    ]
+  },
+  {
+    aiRank:8, appRank:3, name:"UC Berkeley", state:"CA", track:"R", total:49, tier:"C",
+    summary:"Top-tier AI research with BAIR and strong industry ties, but limited undergraduate AI infrastructure.",
+    p1:6,p1max:27, p2:13,p2max:30, p3:13,p3max:20, p4:12,p4max:16, p5:5,p5max:7, p5label:"Permissive",
+    searchDate:"March 2026",
+    highlights:[
+      "Berkeley AI Hub as central resource launched Jan 2026",
+      "BAIR Lab with 20+ faculty and 100+ grad students",
+      "Strong industry partnerships with OpenAI, Google, Meta, Anthropic",
+      "Haas School AI Certificate for MBA students launched Fall 2025",
+      "URAP provides structured undergrad research access",
+      "Data Science major is largest on campus",
+      "AI integration initiative in engineering courses 2026"
+    ],
+    keyEvidence:"Berkeley AI Hub launched January 2026. BAIR Lab operational with 20+ faculty. Haas AI Certificate launched Fall 2025. Verified partnerships with OpenAI, Google, Meta, and Anthropic. URAP provides undergraduate access to faculty AI labs.",
+    sources:[
+      {label:"ai.berkeley.edu", url:"https://ai.berkeley.edu/"},
+      {label:"bair.berkeley.edu", url:"https://bair.berkeley.edu/"},
+      {label:"newsroom.haas.berkeley.edu", url:"https://newsroom.haas.berkeley.edu/uc-berkeley-haas-launches-ai-certificate-to-train-first-generation-of-ai-business-leaders/"}
+    ]
+  },
+  {
+    aiRank:9, appRank:6, name:"UC Davis", state:"CA", track:"R", total:46, tier:"C",
+    summary:"UC Davis demonstrates strong AI research infrastructure but lacks undergraduate AI major and strategic plan.",
+    p1:10,p1max:27, p2:13,p2max:30, p3:8,p3max:20, p4:12,p4max:16, p5:3,p5max:7, p5label:"Neutral",
+    searchDate:"March 2026",
+    highlights:[
+      "UC Davis AI Center in Engineering launched Oct 2024",
+      "AI Council with named members established May 2024",
+      "$20M NSF AI Institute for Next Generation Food Systems (AIFS)",
+      "$500K NEH grant for Center for AI and Experimental Futures (CAIEF)",
+      "Multiple AI courses including new 'AI for All' course",
+      "Bezos Earth Fund $2M AI food systems grant",
+      "UCD partnership with University College Dublin on AI research"
+    ],
+    keyEvidence:"AI Center in Engineering launched Oct 2024. AI Council established May 2024. $20M NSF AI Institute for Food Systems confirmed. Multiple federal grants supporting AI research across disciplines.",
+    sources:[
+      {label:"leadership.ucdavis.edu", url:"https://leadership.ucdavis.edu/about/councils-committees-boards/artificial-intelligence"},
+      {label:"engineering.ucdavis.edu", url:"https://engineering.ucdavis.edu/news/artificial-intelligence-center-engineering-uc-davis"},
+      {label:"caief.ucdavis.edu", url:"https://caief.ucdavis.edu/"}
+    ]
+  },
+  {
+    aiRank:10, appRank:5, name:"UC Santa Barbara", state:"CA", track:"R", total:41, tier:"D",
+    summary:"New AI major launching 2026 with strong research infrastructure but limited institutional governance.",
+    p1:10,p1max:27, p2:7,p2max:30, p3:13,p3max:20, p4:8,p4max:16, p5:3,p5max:7, p5label:"Neutral",
+    searchDate:"March 2026",
+    highlights:[
+      "BS in AI major approved January 2026, launching Fall 2026",
+      "$20M NSF ACTION Institute for AI cybersecurity",
+      "Center for Responsible Machine Learning established",
+      "AI Advisory Committee formed January 2026",
+      "Google Quantum AI long-standing partnership in Santa Barbara",
+      "ACTION Institute offers undergraduate research internships"
+    ],
+    keyEvidence:"BS in AI approved January 2026 launching Fall 2026. AI Advisory Committee co-chaired by CCS Dean Timothy Sherwood formed January 2026. $20M NSF ACTION Institute verified. Google Quantum AI presence in Santa Barbara confirmed.",
+    sources:[
+      {label:"ccs.ucsb.edu", url:"https://ccs.ucsb.edu/news/2026/ccs-dean-co-lead-campuswide-ai-advisory-committee"},
+      {label:"engineering.ucsb.edu", url:"https://engineering.ucsb.edu/news/computer-science-department-offer-undergraduate-major-ai"},
+      {label:"ml.ucsb.edu", url:"https://ml.ucsb.edu/"}
+    ]
+  }
+];
+
+function tierClass(t) { return `tier-${t.toLowerCase()}-label`; }
+function fillClass(score, max) {
+  const pct = score / max;
+  if (pct >= 0.70) return 'fill-strong';
+  if (pct >= 0.45) return 'fill-mid';
+  return 'fill-weak';
+}
+function attClass(label) {
+  const l = (label || '').toLowerCase();
+  if (l === 'enabling')    return 'att-enabling';
+  if (l === 'permissive')  return 'att-permissive';
+  if (l === 'neutral')     return 'att-neutral';
+  if (l === 'restrictive') return 'att-restrictive';
+  return 'att-neutral';
+}
+function trackLabel(t) { return t === 'U' ? 'Regional University' : 'National University'; }
+function attitudeLabel(raw) { return ATTITUDE_LABELS[(raw || '').toLowerCase()] || raw; }
+
+function openModal(idx) {
+  const s = SCHOOLS[idx];
+  document.getElementById('modalSchoolName').textContent = s.name;
+  const ul = document.getElementById('modalHighlights');
+  ul.innerHTML = s.highlights.map(h => `<li>${h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</li>`).join('');
+  document.getElementById('modalEvidence').textContent = s.keyEvidence;
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function buildCard(s, idx) {
+  const sourceChips = s.sources.map(src =>
+    `<a class="source-chip" href="${src.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#8599; ${src.label}</a>`
+  ).join('');
+  const dispAttitude = attitudeLabel(s.p5label);
+  return `
+    <div class="school-card" data-ai="${s.aiRank}" data-app="${s.appRank}" data-score="${s.total}" data-name="${s.name.toLowerCase()}" data-idx="${idx}"
+         style="animation: fadeUp 0.4s ${0.04 * idx}s ease both; opacity:0">
+      <div class="card-top">
+        <div class="card-top-left">
+          <div class="school-name">${s.name}</div>
+          <div class="school-meta">${s.state} &middot; ${trackLabel(s.track)} &middot; As of ${s.searchDate}</div>
+          <div class="tier-label-inline ${tierClass(s.tier)}">${s.tier} Tier &mdash; ${TIER_LABELS[s.tier]}</div>
+        </div>
+        <div class="rank-badges">
+          <div class="rank-badge-ai">AI Readiness #${s.aiRank}</div>
+          <div class="rank-badge-app">#${s.appRank} by Applications</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="score-row">
+          <div class="score-num">${s.total}</div>
+          <div class="score-denom">/100</div>
+        </div>
+        <div class="card-headline">${s.summary}</div>
+        <div class="pillars">
+          <div class="pillar-row">
+            <span class="pillar-name">Commitment</span>
+            <div class="pillar-track"><div class="pillar-fill ${fillClass(s.p1,s.p1max)}" style="width:${Math.round(s.p1/s.p1max*100)}%"></div></div>
+            <span class="pillar-pts">${s.p1}/${s.p1max}</span>
+          </div>
+          <div class="pillar-row">
+            <span class="pillar-name">Curriculum</span>
+            <div class="pillar-track"><div class="pillar-fill ${fillClass(s.p2,s.p2max)}" style="width:${Math.round(s.p2/s.p2max*100)}%"></div></div>
+            <span class="pillar-pts">${s.p2}/${s.p2max}</span>
+          </div>
+          <div class="pillar-row">
+            <span class="pillar-name">Partnerships</span>
+            <div class="pillar-track"><div class="pillar-fill ${fillClass(s.p3,s.p3max)}" style="width:${Math.round(s.p3/s.p3max*100)}%"></div></div>
+            <span class="pillar-pts">${s.p3}/${s.p3max}</span>
+          </div>
+          <div class="pillar-row">
+            <span class="pillar-name">Research</span>
+            <div class="pillar-track"><div class="pillar-fill ${fillClass(s.p4,s.p4max)}" style="width:${Math.round(s.p4/s.p4max*100)}%"></div></div>
+            <span class="pillar-pts">${s.p4}/${s.p4max}</span>
+          </div>
+          <div class="attitude-row">
+            <span class="attitude-name">A(I)ttitude&#8482;</span>
+            <span class="attitude-chip ${attClass(s.p5label)}">${dispAttitude} &middot; ${s.p5}/${s.p5max}</span>
+          </div>
+        </div>
+        <button class="learn-more-btn" onclick="event.stopPropagation(); openModal(${idx})">View Highlights and Key Findings</button>
+        <div class="sources-row">${sourceChips}</div>
+      </div>
+    </div>`;
+}
+
+function renderCards(data) {
+  const grid = document.getElementById('cardsGrid');
+  const cards = data.map((s, i) => buildCard(s, i)).join('');
+  const requestCard = `
+    <div class="request-card">
+      <h3>Your school not here yet?</h3>
+      <p>Submit your school and we'll notify you when our AIREDEX&#8482; team completes its analysis.</p>
+      <input class="req-input" type="text" placeholder="School name" />
+      <input class="req-input" type="email" placeholder="Your email" />
+      <select class="req-select">
+        <option value="" disabled selected>I am a...</option>
+        <option>Student</option><option>Parent</option>
+        <option>College counselor</option>
+        <option>School administrator</option>
+        <option>Other</option>
+      </select>
+      <button class="req-btn">Submit</button>
+    </div>`;
+  grid.innerHTML = cards + requestCard;
+}
+
+function sortCards(by, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const sorted = [...SCHOOLS].sort((a, b) => {
+    if (by === 'ai')  return a.aiRank - b.aiRank;
+    if (by === 'app') return a.appRank - b.appRank;
+    return 0;
+  });
+  renderCards(sorted);
+}
+
+renderCards([...SCHOOLS].sort((a,b) => a.aiRank - b.aiRank));
+</script>
+</body>
+</html>
