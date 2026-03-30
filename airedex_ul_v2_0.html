@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIREDEX™ Research Engine v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1B2A; --navy2: #162437; --navy3: #1E2F42;
+    --gold: #C9A84C; --gold2: #E8C96A;
+    --ice: #E8F0F7; --dim: #8BA3BA; --slate: #7A96B0;
+    --green: #2ECC71; --red: #E74C3C; --amber: #F39C12;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--navy); color: var(--ice); font-family: 'DM Sans', sans-serif; padding: 32px; min-height: 100vh; }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* HEADER */
+  .header-box { border-bottom: 1px solid rgba(201,168,76,0.3); padding-bottom: 20px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: var(--gold); }
+  .brand span { font-size: 12px; font-weight: 400; color: var(--dim); margin-left: 8px; }
+  .version-badge { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); border: 1px solid rgba(201,168,76,0.4); padding: 3px 8px; border-radius: 3px; }
+
+  /* SETUP PANEL */
+  .setup-panel { background: var(--navy2); padding: 20px 24px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 24px; }
+  .setup-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .field-group { display: flex; flex-direction: column; gap: 6px; }
+  .field-label { font-size: 11px; color: var(--dim); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; }
+  input[type="password"], input[type="file"] { background: #000; border: 1px solid rgba(201,168,76,0.5); color: #fff; padding: 10px 12px; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 13px; }
+  input[type="password"] { width: 320px; }
+  input[type="file"] { width: 260px; cursor: pointer; font-size: 12px; }
+  .file-status { font-size: 11px; color: var(--dim); margin-top: 4px; font-family: 'DM Mono', monospace; }
+  .file-status.loaded { color: var(--green); }
+
+  /* BUTTONS */
+  .btn { border: none; padding: 10px 20px; border-radius: 4px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .btn-primary { background: var(--gold); color: var(--navy); }
+  .btn-primary:hover:not(:disabled) { background: var(--gold2); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+  .btn-outline:hover:not(:disabled) { background: rgba(201,168,76,0.1); }
+  .btn-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+  .btn-green { background: var(--green); color: #000; }
+  .btn-green:hover { background: #27ae60; }
+  .btn-red { background: transparent; border: 1px solid var(--red); color: var(--red); }
+  .btn-red:hover { background: rgba(231,76,60,0.1); }
+
+  /* STATUS BAR */
+  .status-bar { background: var(--navy3); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 10px 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--dim); font-family: 'DM Mono', monospace; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); flex-shrink: 0; }
+  .status-dot.active { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 1.5s infinite; }
+  .status-dot.done { background: var(--green); }
+  .status-dot.error { background: var(--red); }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* SCHOOL GRID */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .card { background: var(--navy2); padding: 16px 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06); transition: border-color 0.3s; }
+  .card.running { border-color: var(--gold); box-shadow: 0 0 12px rgba(201,168,76,0.15); }
+  .card.done { border-color: rgba(46,204,113,0.4); }
+  .card.error { border-color: rgba(231,76,60,0.4); }
+  .card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+  .card-meta { font-size: 11px; color: var(--dim); font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 6px; }
+  .card-score { font-size: 20px; font-family: 'DM Mono', monospace; color: var(--gold); font-weight: 500; margin-top: 8px; }
+  .card-score span { font-size: 11px; color: var(--dim); }
+  .new-badge { font-size: 10px; background: rgba(46,204,113,0.2); color: var(--green); border: 1px solid rgba(46,204,113,0.3); padding: 1px 6px; border-radius: 3px; font-family: 'DM Mono', monospace; }
+
+  /* CONFIRMATION PANEL */
+  .confirm-panel { background: var(--navy2); border: 1px solid rgba(201,168,76,0.4); border-radius: 8px; padding: 24px; margin-bottom: 28px; display: none; }
+  .confirm-panel.visible { display: block; }
+  .confirm-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; color: var(--gold); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .confirm-school { font-size: 18px; color: var(--ice); }
+  .diff-section { margin-bottom: 16px; }
+  .diff-label { font-size: 11px; color: var(--dim); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .diff-list { display: flex; flex-direction: column; gap: 4px; }
+  .diff-item { font-size: 13px; padding: 6px 10px; border-radius: 4px; font-family: 'DM Mono', monospace; line-height: 1.4; }
+  .diff-item.existing { background: rgba(139,163,186,0.1); color: var(--dim); }
+  .diff-item.new { background: rgba(46,204,113,0.1); color: var(--green); border-left: 2px solid var(--green); }
+  .diff-item.new::before { content: '+ '; }
+  .score-compare { display: flex; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
+  .score-box { background: var(--navy3); padding: 12px 16px; border-radius: 6px; text-align: center; min-width: 100px; }
+  .score-box-label { font-size: 10px; color: var(--dim); font-family: 'DM Mono', monospace; text-transform: uppercase; margin-bottom: 4px; }
+  .score-box-val { font-size: 24px; font-family: 'DM Mono', monospace; color: var(--ice); font-weight: 500; }
+  .score-box-val.changed { color: var(--gold); }
+  .confirm-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .pillar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
+  .pillar-box { background: var(--navy3); padding: 10px; border-radius: 4px; text-align: center; }
+  .pillar-name { font-size: 10px; color: var(--dim); font-family: 'DM Mono', monospace; margin-bottom: 4px; }
+  .pillar-val { font-size: 16px; font-family: 'DM Mono', monospace; color: var(--ice); }
+  .pillar-val.changed { color: var(--gold); }
+  .pillar-old { font-size: 10px; color: var(--dim); font-family: 'DM Mono', monospace; text-decoration: line-through; }
+
+  /* EXPORT ROW */
+  .export-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 16px 20px; background: var(--navy2); border-radius: 8px; border: 1px solid rgba(46,204,113,0.3); }
+  .export-row.hidden { display: none; }
+  .export-label { font-size: 13px; color: var(--dim); font-family: 'DM Mono', monospace; flex: 1; }
+
+  /* PROGRESS */
+  .progress-wrap { background: rgba(255,255,255,0.06); border-radius: 4px; height: 4px; margin-top: 8px; overflow: hidden; }
+  .progress-bar { height: 100%; background: var(--gold); border-radius: 4px; transition: width 0.4s; width: 0%; }
+
+  /* DIVIDER */
+  .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 20px 0; }
+
+  .run-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header-box">
+    <div>
+      <div class="brand">AIREDEX™ <span>INTERNAL RESEARCH ENGINE</span></div>
+    </div>
+    <div class="version-badge">v2.0 · UL TRACK CALIBRATION · claude-sonnet-4-20250514</div>
+  </div>
+
+  <!-- SETUP PANEL -->
+  <div class="setup-panel">
+    <div class="setup-row">
+      <div class="field-group">
+        <div class="field-label">Anthropic API Key</div>
+        <input type="password" id="apiKey" placeholder="sk-ant-...">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Load Existing CSV (optional)</div>
+        <input type="file" id="csvFile" accept=".csv" onchange="loadCSV(this)">
+        <div class="file-status" id="fileStatus">No file loaded — will start fresh</div>
+      </div>
+      <div class="field-group" style="justify-content: flex-end;">
+        <div class="field-label">&nbsp;</div>
+        <div class="run-controls">
+          <button class="btn btn-primary" onclick="runAll()" id="runBtn">▶ Run Research Engine</button>
+          <button class="btn btn-outline" onclick="runSingle()" id="singleBtn">Run One School</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div class="status-dot" id="globalDot"></div>
+    <div id="globalStatus">Ready. Load existing CSV to accumulate, or run fresh.</div>
+    <div style="margin-left: auto; font-size: 11px;" id="progressLabel"></div>
+  </div>
+  <div class="progress-wrap" style="margin-bottom: 20px;">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- SCHOOL GRID -->
+  <div class="grid" id="cardGrid"></div>
+
+  <!-- CONFIRMATION PANEL -->
+  <div class="confirm-panel" id="confirmPanel">
+    <div class="confirm-title">
+      <span>⚠</span>
+      <span>Review Changes: <span class="confirm-school" id="confirmSchoolName"></span></span>
+    </div>
+
+    <div class="score-compare" id="scoreCompare"></div>
+
+    <div class="pillar-grid" id="pillarGrid"></div>
+
+    <div class="diff-section" id="posSection">
+      <div class="diff-label">Positive Flags</div>
+      <div class="diff-list" id="posDiff"></div>
+    </div>
+    <div class="diff-section" id="negSection">
+      <div class="diff-label">Negative Flags</div>
+      <div class="diff-list" id="negDiff"></div>
+    </div>
+    <div class="diff-section" id="srcSection">
+      <div class="diff-label">Sources</div>
+      <div class="diff-list" id="srcDiff"></div>
+    </div>
+
+    <div class="confirm-actions">
+      <button class="btn btn-green" onclick="confirmAccept()">Accept &amp; Merge</button>
+      <button class="btn btn-red btn-outline" onclick="confirmSkip()">Skip This School</button>
+    </div>
+  </div>
+
+  <!-- EXPORT ROW -->
+  <div class="export-row hidden" id="exportRow">
+    <div class="export-label" id="exportLabel">Research complete.</div>
+    <button class="btn btn-outline" onclick="downloadCSV()">Download airedex_data.csv</button>
+  </div>
+
+</div>
+
+<script>
+// ─── UNIVERSITIES ───────────────────────────────────────────────────────────
+const UNIVERSITIES = [
+  { rank:1,  name:"Appalachian State University",        state:"NC", track:"UL", category:"Regional University", undergrad:"19,560", pub_pri:"Public"  },
+  { rank:2,  name:"Illinois State University",           state:"IL", track:"UL", category:"Regional University", undergrad:"19,107", pub_pri:"Public"  },
+  { rank:3,  name:"Rowan University",                    state:"NJ", track:"UL", category:"Regional University", undergrad:"16,199", pub_pri:"Public"  },
+  { rank:4,  name:"University of North Carolina Wilmington", state:"NC", track:"UL", category:"Regional University", undergrad:"15,254", pub_pri:"Public"  },
+  { rank:5,  name:"Baylor University",                   state:"TX", track:"UL", category:"Regional University", undergrad:"14,915", pub_pri:"Private" },
+  { rank:6,  name:"Western Washington University",       state:"WA", track:"UL", category:"Regional University", undergrad:"13,752", pub_pri:"Public"  },
+  { rank:7,  name:"Loyola University Chicago",           state:"IL", track:"UL", category:"Regional University", undergrad:"12,538", pub_pri:"Private" },
+  { rank:8,  name:"University of New Hampshire",         state:"NH", track:"UL", category:"Regional University", undergrad:"11,365", pub_pri:"Public"  },
+  { rank:9,  name:"Fordham University",                  state:"NY", track:"UL", category:"Regional University", undergrad:"10,396", pub_pri:"Private" }
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let existingData = {};     // keyed by university name, holds current CSV row data
+let pendingResults = [];   // queue of new research results awaiting confirmation
+let finalData = {};        // merged confirmed data
+let confirmQueue = [];     // schools waiting for confirmation
+let currentConfirm = null; // the result currently on screen for review
+let runDate = todayStr();
+
+function todayStr() {
+  return new Date().toISOString().slice(0,7); // YYYY-MM
+}
+
+function todayFull() {
+  return new Date().toISOString().slice(0,10); // YYYY-MM-DD
+}
+
+// ─── CSV LOADER ──────────────────────────────────────────────────────────────
+function loadCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const text = e.target.result;
+      const rows = text.split('\n').filter(r => r.trim());
+      // Skip comment row(s) and header
+      const dataRows = rows.filter(r => !r.startsWith('#') && !r.startsWith('AI Rank'));
+      let count = 0;
+      dataRows.forEach(row => {
+        const cols = parseCSVRow(row);
+        if (cols.length < 3) return;
+        const uniName = cols[2].replace(/"/g,'').trim();
+        if (!uniName) return;
+        existingData[uniName] = {
+          ai_rank:      cols[0],
+          app_rank:     cols[1],
+          name:         uniName,
+          state:        cols[3],
+          track:        cols[4],
+          p1:           parseFloat(cols[5])||0,
+          p1_conf:      cols[6],
+          p2:           parseFloat(cols[7])||0,
+          p2_conf:      cols[8],
+          p3:           parseFloat(cols[9])||0,
+          p3_conf:      cols[10],
+          p4:           parseFloat(cols[11])||0,
+          p4_conf:      cols[12],
+          p5:           parseFloat(cols[13])||0,
+          p5_conf:      cols[14],
+          total:        parseFloat(cols[15])||0,
+          tier:         cols[16],
+          summary:      cols[17],
+          pos_flags:    cols[18],
+          neg_flags:    cols[19],
+          research_notes: cols[20],
+          key_evidence: cols[21],
+          notable_alumni: cols[22],
+          sources:      cols[23],
+          search_date:  cols[24],
+          newest_source: cols[25],
+          freshness:    cols[26]
+        };
+        count++;
+        finalData[uniName] = {...existingData[uniName]};
+      });
+      const el = document.getElementById('fileStatus');
+      el.textContent = `Loaded ${count} school records`;
+      el.className = 'file-status loaded';
+      setStatus(`Existing CSV loaded: ${count} schools. New findings will be merged.`, 'done');
+    } catch(err) {
+      document.getElementById('fileStatus').textContent = 'Error reading file: ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+}
+
+function parseCSVRow(row) {
+  const cols = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < row.length; i++) {
+    const c = row[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { cols.push(cur); cur = ''; }
+    else { cur += c; }
+  }
+  cols.push(cur);
+  return cols;
+}
+
+// ─── INIT CARDS ──────────────────────────────────────────────────────────────
+function init() {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = '';
+  UNIVERSITIES.forEach((uni, i) => {
+    const existing = existingData[uni.name];
+    const scoreDisplay = existing ? `<div class="card-score">${existing.total} <span>/ 100</span></div>` : '';
+    grid.innerHTML += `
+      <div class="card" id="card-${i}">
+        <div class="card-name">${uni.name}</div>
+        <div class="card-meta">
+          <span class="status-dot" id="dot-${i}"></span>
+          <span id="txt-${i}">${existing ? 'Baseline loaded' : 'No baseline'}</span>
+        </div>
+        <div style="font-size:11px;color:var(--dim);font-family:'DM Mono',monospace;margin-top:4px;">${uni.undergrad} undergrad · ${uni.pub_pri}</div>
+        ${scoreDisplay}
+      </div>`;
+  });
+}
+
+// ─── RUN ALL ──────────────────────────────────────────────────────────────────
+async function runAll() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) return alert('Please enter your API key.');
+  disableControls(true);
+  confirmQueue = [];
+  setStatus('Research engine running...', 'active');
+  for (let i = 0; i < UNIVERSITIES.length; i++) {
+    updateProgress(i, UNIVERSITIES.length);
+    await researchSchool(i, key);
+  }
+  updateProgress(UNIVERSITIES.length, UNIVERSITIES.length);
+  setStatus('Research complete. Review and confirm each school below.', 'done');
+  processConfirmQueue();
+}
+
+// ─── RUN SINGLE ──────────────────────────────────────────────────────────────
+async function runSingle() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) return alert('Please enter your API key.');
+  const name = prompt('Enter university name exactly as listed:\n\n' + UNIVERSITIES.map(u => u.name).join('\n'));
+  if (!name) return;
+  const idx = UNIVERSITIES.findIndex(u => u.name.toLowerCase() === name.toLowerCase());
+  if (idx === -1) return alert('University not found. Check spelling.');
+  disableControls(true);
+  setStatus(`Researching ${UNIVERSITIES[idx].name}...`, 'active');
+  await researchSchool(idx, key);
+  setStatus('Done. Review confirmation below.', 'done');
+  processConfirmQueue();
+}
+
+// ─── RESEARCH ONE SCHOOL ─────────────────────────────────────────────────────
+async function researchSchool(i, key) {
+  const uni = UNIVERSITIES[i];
+  const dot = document.getElementById(`dot-${i}`);
+  const txt = document.getElementById(`txt-${i}`);
+  const card = document.getElementById(`card-${i}`);
+
+  card.className = 'card running';
+  dot.className = 'status-dot active';
+  txt.textContent = 'Searching...';
+
+  const existing = existingData[uni.name];
+  const existingContext = existing
+    ? `EXISTING DATA FOR CONTEXT (do not simply repeat these — search for NEW evidence to add):
+Positive flags already known: ${existing.pos_flags}
+Negative flags already known: ${existing.neg_flags}
+Sources already found: ${existing.sources}
+Current scores: P1=${existing.p1}, P2=${existing.p2}, P3=${existing.p3}, P4=${existing.p4}, P5=${existing.p5}`
+    : 'No existing data — perform comprehensive first-time research.';
+
+  const prompt = `You are a research analyst for AIREDEX™, an AI readiness ranking system for American universities.
+
+Perform a thorough web search for ${uni.name} AI readiness as of ${new Date().toLocaleDateString('en-US', {month:'long', year:'numeric'})}. This is a U-L track school (10,000-20,000 undergrads, ${uni.pub_pri}). Focus on practical AI programs, governance structures, industry partnerships, and curriculum integration appropriate for a mid-size university.
+
+${existingContext}
+
+SCORING SYSTEM:
+- P1 Commitment (max 27pts): Executive AI leadership, dedicated AI office, strategic AI plan, governance structures
+- P2 Curriculum (max 30pts): AI degrees, minors, required AI courses, cross-disciplinary AI integration
+- P3 Partnerships (max 20pts): Industry AI partnerships, government grants, corporate AI centers on campus
+- P4 Research (max 16pts): AI research institutes, faculty, grants, publications, compute infrastructure
+- P5 A(I)ttitude (max 7pts): Derived from overall posture — enabling/progressive/neutral/cautious/resistant
+
+INSTRUCTIONS:
+1. Search specifically for NEW developments not in the existing data above
+2. Score each pillar based on ALL evidence (existing + new combined)
+3. For positive_flags and negative_flags: include BOTH existing confirmed items AND any new items you find. Tag new items with [NEW ${todayFull()}] at the end
+4. Sources: include existing sources plus any new ones found. Tag new sources with [NEW ${todayFull()}]
+5. NO em dashes anywhere in your response
+
+CRITICAL OUTPUT RULE: Your response must begin with {{ and end with }}. Output ONLY the raw JSON object below. No preamble, no explanation, no markdown, no code fences. Start your response with the opening brace.
+
+{
+  "p1": <number 0-27>,
+  "p1_conf": "verified|inferred",
+  "p2": <number 0-30>,
+  "p2_conf": "verified|inferred",
+  "p3": <number 0-20>,
+  "p3_conf": "verified|inferred",
+  "p4": <number 0-16>,
+  "p4_conf": "verified|inferred",
+  "p5": <number 0-7>,
+  "p5_conf": "verified|inferred",
+  "summary": "<2 sentence summary, no em dashes>",
+  "positive_flags": ["flag1", "flag2"],
+  "negative_flags": ["flag1", "flag2"],
+  "research_notes": "<detailed notes>",
+  "key_evidence": "<key evidence string>",
+  "sources": ["url1", "url2"]
+}`;
+
+  try {
+    // PASS 1: Web research
+    const researchResp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 4000,
+        tools: [{ type: "web_search_20250305", name: "web_search" }],
+        tool_choice: { type: "any" },
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const researchData = await researchResp.json();
+    if (researchData.error) throw new Error(researchData.error.message);
+
+    // Extract all text from research pass
+    const researchText = researchData.content
+      .filter(c => c.type === 'text')
+      .map(c => c.text)
+      .join('\n');
+
+    // PASS 2: Clean JSON extraction
+    const jsonPrompt = `Based on this research about ${uni.name}:\n\n${researchText}\n\nReturn ONLY a valid JSON object with no preamble, no markdown, no explanation. Start with { and end with }:\n{"p1":0,"p1_conf":"verified","p2":0,"p2_conf":"verified","p3":0,"p3_conf":"verified","p4":0,"p4_conf":"verified","p5":0,"p5_conf":"verified","summary":"","positive_flags":[],"negative_flags":[],"research_notes":"","key_evidence":"","sources":[]}`;
+
+    const jsonResp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 4000,
+        messages: [{ role: "user", content: jsonPrompt }]
+      })
+    });
+
+    const jsonData = await jsonResp.json();
+    if (jsonData.error) throw new Error(jsonData.error.message);
+
+    const rawText = jsonData.content.find(c => c.type === 'text')?.text || '{}';
+    const stripped = rawText.replace(/```json|```/g, '').trim();
+    const startIdx = stripped.indexOf('{');
+    const endIdx = stripped.lastIndexOf('}');
+    if (startIdx === -1) throw new Error('No JSON found in response');
+    const result = JSON.parse(stripped.substring(startIdx, endIdx + 1));
+    const total = (result.p1||0)+(result.p2||0)+(result.p3||0)+(result.p4||0)+(result.p5||0);
+
+    // Queue for confirmation
+    confirmQueue.push({ uni, i, result, total, existing });
+
+    card.className = 'card done';
+    dot.className = 'status-dot done';
+    txt.textContent = `Score: ${total} — pending review`;
+
+    const scoreEl = card.querySelector('.card-score');
+    if (scoreEl) {
+      scoreEl.innerHTML = `${total} <span>/ 100</span>`;
+    } else {
+      card.innerHTML += `<div class="card-score">${total} <span>/ 100</span></div>`;
+    }
+
+    if (existing && total !== existing.total) {
+      const badge = document.createElement('span');
+      badge.className = 'new-badge';
+      badge.textContent = total > existing.total ? `+${total - existing.total}` : `${total - existing.total}`;
+      card.querySelector('.card-meta').appendChild(badge);
+    }
+
+  } catch(err) {
+    card.className = 'card error';
+    dot.className = 'status-dot error';
+    txt.textContent = 'Error: ' + err.message.substring(0, 60);
+    console.error(uni.name, err);
+  }
+}
+
+// ─── CONFIRMATION FLOW ────────────────────────────────────────────────────────
+function processConfirmQueue() {
+  if (confirmQueue.length === 0) {
+    document.getElementById('confirmPanel').classList.remove('visible');
+    showExportRow();
+    disableControls(false);
+    return;
+  }
+  currentConfirm = confirmQueue.shift();
+  showConfirmPanel(currentConfirm);
+}
+
+function showConfirmPanel(item) {
+  const { uni, result, total, existing } = item;
+  const panel = document.getElementById('confirmPanel');
+  panel.classList.add('visible');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  document.getElementById('confirmSchoolName').textContent = uni.name;
+
+  // Score compare
+  const scoreHTML = `
+    <div class="score-box">
+      <div class="score-box-label">Previous Total</div>
+      <div class="score-box-val">${existing ? existing.total : '--'}</div>
+    </div>
+    <div class="score-box">
+      <div class="score-box-label">New Total</div>
+      <div class="score-box-val ${existing && total !== existing.total ? 'changed' : ''}">${total}</div>
+    </div>`;
+  document.getElementById('scoreCompare').innerHTML = scoreHTML;
+
+  // Pillar compare
+  const pillars = [
+    {label:'P1 Commit', max:27, key:'p1'},
+    {label:'P2 Curric', max:30, key:'p2'},
+    {label:'P3 Partner', max:20, key:'p3'},
+    {label:'P4 Research', max:16, key:'p4'},
+    {label:'P5 A(I)ttitude', max:7, key:'p5'}
+  ];
+  let pillarHTML = '';
+  pillars.forEach(p => {
+    const newVal = result[p.key] || 0;
+    const oldVal = existing ? (existing[p.key] || 0) : null;
+    const changed = oldVal !== null && newVal !== oldVal;
+    pillarHTML += `<div class="pillar-box">
+      <div class="pillar-name">${p.label}</div>
+      <div class="pillar-val ${changed ? 'changed' : ''}">${newVal}<span style="font-size:10px;color:var(--dim)">/${p.max}</span></div>
+      ${changed ? `<div class="pillar-old">${oldVal}</div>` : ''}
+    </div>`;
+  });
+  document.getElementById('pillarGrid').innerHTML = pillarHTML;
+
+  // Flags diff
+  renderDiff('posDiff', existing ? splitPipe(existing.pos_flags) : [], result.positive_flags || []);
+  renderDiff('negDiff', existing ? splitPipe(existing.neg_flags) : [], result.negative_flags || []);
+  renderDiff('srcDiff', existing ? splitPipe(existing.sources) : [], result.sources || []);
+}
+
+function splitPipe(str) {
+  if (!str) return [];
+  return str.split('|').map(s => s.trim()).filter(Boolean);
+}
+
+function renderDiff(containerId, existingItems, newItems) {
+  const container = document.getElementById(containerId);
+  let html = '';
+  // Show existing items
+  existingItems.forEach(item => {
+    const isAlreadyInNew = newItems.some(n => n.replace(/\[NEW [^\]]+\]/,'').trim().toLowerCase() === item.replace(/\[NEW [^\]]+\]/,'').trim().toLowerCase());
+    if (!isAlreadyInNew) {
+      html += `<div class="diff-item existing">${escapeHTML(item)}</div>`;
+    }
+  });
+  // Show new items, highlight ones tagged [NEW]
+  newItems.forEach(item => {
+    const isTaggedNew = item.includes('[NEW ');
+    const existingMatch = existingItems.some(e => e.replace(/\[NEW [^\]]+\]/,'').trim().toLowerCase() === item.replace(/\[NEW [^\]]+\]/,'').trim().toLowerCase());
+    if (isTaggedNew || !existingMatch) {
+      html += `<div class="diff-item new">${escapeHTML(item)}</div>`;
+    } else {
+      html += `<div class="diff-item existing">${escapeHTML(item)}</div>`;
+    }
+  });
+  container.innerHTML = html || '<div style="font-size:12px;color:var(--dim);padding:6px 10px;">No items</div>';
+}
+
+function escapeHTML(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function confirmAccept() {
+  const { uni, result, total, existing, i } = currentConfirm;
+
+  // Merge pipe-delimited fields -- keep existing, add new, deduplicate
+  const mergedPos = mergePipeField(existing?.pos_flags, result.positive_flags);
+  const mergedNeg = mergePipeField(existing?.neg_flags, result.negative_flags);
+  const mergedSrc = mergePipeField(existing?.sources, result.sources);
+
+  const tier = calcTier(total);
+  const appRank = existing?.app_rank || uni.rank;
+
+  finalData[uni.name] = {
+    ai_rank:        existing?.ai_rank || uni.rank,
+    app_rank:       appRank,
+    name:           uni.name,
+    state:          uni.state,
+    track:          uni.track,
+    p1:             result.p1,
+    p1_conf:        result.p1_conf || 'verified',
+    p2:             result.p2,
+    p2_conf:        result.p2_conf || 'verified',
+    p3:             result.p3,
+    p3_conf:        result.p3_conf || 'verified',
+    p4:             result.p4,
+    p4_conf:        result.p4_conf || 'verified',
+    p5:             result.p5,
+    p5_conf:        result.p5_conf || 'verified',
+    total:          total,
+    tier:           tier,
+    summary:        result.summary || existing?.summary || '',
+    pos_flags:      mergedPos,
+    neg_flags:      mergedNeg,
+    research_notes: result.research_notes || existing?.research_notes || '',
+    key_evidence:   result.key_evidence || existing?.key_evidence || '',
+    notable_alumni: existing?.notable_alumni || '',
+    sources:        mergedSrc,
+    search_date:    runDate,
+    newest_source:  runDate,
+    freshness:      'green'
+  };
+
+  document.getElementById(`txt-${i}`).textContent = `Confirmed: ${total}`;
+  document.getElementById(`card-${i}`).className = 'card done';
+  currentConfirm = null;
+  processConfirmQueue();
+}
+
+function confirmSkip() {
+  const { uni, existing, i } = currentConfirm;
+  // Keep existing data unchanged
+  if (existing) finalData[uni.name] = { ...existing };
+  document.getElementById(`txt-${i}`).textContent = 'Skipped';
+  currentConfirm = null;
+  processConfirmQueue();
+}
+
+function mergePipeField(existingStr, newArray) {
+  const existing = splitPipe(existingStr);
+  const combined = [...existing];
+  (newArray || []).forEach(item => {
+    const clean = item.replace(/\[NEW [^\]]+\]/,'').trim().toLowerCase();
+    const alreadyExists = combined.some(e => e.replace(/\[NEW [^\]]+\]/,'').trim().toLowerCase() === clean);
+    if (!alreadyExists) combined.push(item);
+  });
+  return combined.join(' | ');
+}
+
+function calcTier(total) {
+  if (total >= 90) return 'S';
+  if (total >= 75) return 'A';
+  if (total >= 60) return 'B';
+  if (total >= 45) return 'C';
+  return 'D';
+}
+
+// ─── EXPORT ──────────────────────────────────────────────────────────────────
+function showExportRow() {
+  const row = document.getElementById('exportRow');
+  row.classList.remove('hidden');
+  const confirmed = Object.keys(finalData).length;
+  document.getElementById('exportLabel').textContent = `${confirmed} school records ready to export.`;
+}
+
+function downloadCSV() {
+  const COMMENT = '# A(I)ttitude Matrix: R Track — Enabling(>=50pts=7) Permissive(39-49=5) Neutral(27-38=3) Restrictive(<27=0) | U Track — Enabling(>=54pts=10) Permissive(41-53=7) Neutral(29-40=4) Restrictive(<29=0)';
+  const HEADER = 'AI Rank,App Rank,University,State,Track,P1 Commitment,P1 Conf,P2 Curriculum,P2 Conf,P3 Partnerships,P3 Conf,P4 Research,P4 Conf,P5 A(I)ttitude,P5 Conf,Total Score,Tier,Summary,Positive Flags,Negative Flags,Research Notes,Key Evidence,Notable Alumni,Sources,Search Date,Newest Source,Freshness';
+
+  // Sort by total score descending, reassign AI ranks
+  const sorted = Object.values(finalData).sort((a,b) => (b.total||0)-(a.total||0));
+  sorted.forEach((row, idx) => { row.ai_rank = idx + 1; });
+
+  let csv = COMMENT + '\n' + HEADER + '\n';
+  sorted.forEach(r => {
+    const fields = [
+      r.ai_rank, r.app_rank, q(r.name), r.state, r.track,
+      r.p1, r.p1_conf, r.p2, r.p2_conf, r.p3, r.p3_conf,
+      r.p4, r.p4_conf, r.p5, r.p5_conf, r.total, r.tier,
+      q(r.summary), q(r.pos_flags), q(r.neg_flags),
+      q(r.research_notes), q(r.key_evidence), q(r.notable_alumni||''),
+      q(r.sources), r.search_date, r.newest_source, r.freshness
+    ];
+    csv += fields.join(',') + '\n';
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'airedex_ul_calibration.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function q(val) {
+  if (val === null || val === undefined) return '""';
+  return '"' + String(val).replace(/"/g, '""') + '"';
+}
+
+// ─── UTILITIES ───────────────────────────────────────────────────────────────
+function setStatus(msg, state) {
+  document.getElementById('globalStatus').textContent = msg;
+  const dot = document.getElementById('globalDot');
+  dot.className = 'status-dot' + (state ? ' ' + state : '');
+}
+
+function updateProgress(done, total) {
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = done > 0 ? `${done} / ${total}` : '';
+}
+
+function disableControls(disabled) {
+  document.getElementById('runBtn').disabled = disabled;
+  document.getElementById('singleBtn').disabled = disabled;
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
