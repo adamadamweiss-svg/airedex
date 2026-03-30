@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIREDEX™ Internal Research Engine — U Track</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1B2A; --navy2: #162437; --gold: #C9A84C; --gold2: #E8C96A;
+    --ice: #E8F0F7; --dim: #8BA3BA; --slate: #7A96B0;
+  }
+  body { background: var(--navy); color: var(--ice); font-family: 'DM Sans', sans-serif; padding: 40px; min-height: 100vh; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .header-box { border-bottom: 1px solid rgba(201,168,76,0.3); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+  .brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 24px; color: var(--gold); }
+  .input-group { background: var(--navy2); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; }
+  input { background: #000; border: 1px solid var(--gold); color: #fff; padding: 10px; width: 350px; border-radius: 4px; font-family: 'DM Mono', monospace; }
+  button { background: var(--gold); color: var(--navy); border: none; padding: 12px 24px; border-radius: 4px; font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer; transition: 0.2s; }
+  button:hover { background: var(--gold2); transform: translateY(-2px); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+  .card { background: var(--navy2); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
+  .card.running { border-color: var(--gold); box-shadow: 0 0 15px rgba(201,168,76,0.2); }
+  .card-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 16px; margin-bottom: 10px; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #333; display: inline-block; margin-right: 8px; }
+  .status-dot.active { background: #2ECC71; box-shadow: 0 0 8px #2ECC71; }
+  .status-dot.error { background: #E74C3C; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header-box">
+    <div class="brand">AIREDEX™ <span style="font-size: 14px; font-weight: 400; color: var(--dim);">INTERNAL RESEARCH v1.4.1 — U TRACK CALIBRATION</span></div>
+    <div id="exportArea" style="display:none;">
+       <button onclick="downloadCSV()" style="background: transparent; border: 1px solid var(--gold); color: var(--gold);">Download AIREDEX™ CSV</button>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <div style="margin-bottom: 10px; font-size: 14px; color: var(--dim);">Paste Anthropic API Key (Stays in local memory only):</div>
+    <input type="password" id="apiKey" placeholder="sk-ant-...">
+    <button onclick="runAll()" id="runBtn" style="margin-left: 10px;">▶ Run Research Engine</button>
+  </div>
+
+  <div class="grid" id="cardGrid"></div>
+</div>
+
+<script>
+const UNIVERSITIES = [
+  { rank: 1, name: "Cal Poly San Luis Obispo", state: "CA", track: "U", category: "Regional University", region: "West", usnews_rank: "#1 Regional West" },
+  { rank: 2, name: "Bentley University", state: "MA", track: "U", category: "Regional University", region: "North", usnews_rank: "#1 Regional North" },
+  { rank: 3, name: "Appalachian State University", state: "NC", track: "U", category: "Regional University", region: "South", usnews_rank: "#3 Regional South" },
+  { rank: 4, name: "Butler University", state: "IN", track: "U", category: "Regional University", region: "Midwest", usnews_rank: "#1 Regional Midwest" },
+  { rank: 5, name: "Elon University", state: "NC", track: "U", category: "Regional University", region: "South", usnews_rank: "~#8 Regional South" }
+];
+
+let results = [];
+
+function init() {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = '';
+  UNIVERSITIES.forEach((uni, i) => {
+    grid.innerHTML += `
+      <div class="card" id="card-${i}">
+        <div class="card-title">${uni.name}</div>
+        <div style="font-size: 11px; color: var(--dim); margin-bottom: 6px;">${uni.usnews_rank} &bull; ${uni.region}</div>
+        <div style="font-size: 12px; color: var(--dim);"><span class="status-dot" id="dot-${i}"></span><span id="txt-${i}">Idle</span></div>
+      </div>`;
+  });
+}
+
+async function runAll() {
+  const key = document.getElementById('apiKey').value;
+  if (!key) return alert("Please enter your API Key");
+  document.getElementById('runBtn').disabled = true;
+  results = [];
+  for(let i=0; i<UNIVERSITIES.length; i++) {
+    await scoreUni(i, key);
+  }
+  document.getElementById('exportArea').style.display = 'block';
+  document.getElementById('runBtn').disabled = false;
+}
+
+async function scoreUni(i, key) {
+  const uni = UNIVERSITIES[i];
+  const dot = document.getElementById(`dot-${i}`);
+  const txt = document.getElementById(`txt-${i}`);
+  const card = document.getElementById(`card-${i}`);
+
+  card.classList.add('running');
+  dot.className = 'status-dot active';
+  txt.textContent = 'Searching 2026 data...';
+
+  const prompt = `Perform a deep web search for ${uni.name} AI readiness as of March 2026. This is a US News Regional University (not a research-intensive R1). Return ONLY a JSON object with scores for: p1(Commitment), p2(Curriculum), p3(Partnerships), p4(Research), p5(A(I)ttitude). Max scores are 27, 30, 20, 16, 7. NO M-DASHES. For each pillar, include evidence of: named AI institute or center, AI executive role, AI strategic plan, capital commitments, AI degree or major, AI minor, AI ethics course, campus AI tool, industry or government AI partnerships, AI research output, and any AI spinouts or patents. Include summary, positive_flags, negative_flags, and sources.`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-3-5-sonnet-20240620",
+        max_tokens: 4000,
+        tools: [{ type: "web_search_20250305", name: "web_search" }],
+        tool_choice: { type: "any" },
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const rawText = data.content.find(c => c.type === 'text')?.text || "{}";
+    const startIdx = rawText.indexOf('{');
+    const endIdx = rawText.lastIndexOf('}');
+    if (startIdx === -1) throw new Error("No JSON found");
+
+    const cleanJson = JSON.parse(rawText.substring(startIdx, endIdx + 1));
+
+    results.push({ ...uni, ...cleanJson });
+    txt.textContent = 'Scored: ' + (cleanJson.p1 + cleanJson.p2 + cleanJson.p3 + cleanJson.p4 + cleanJson.p5);
+  } catch (err) {
+    dot.className = 'status-dot error';
+    txt.textContent = 'Error: ' + err.message;
+    console.error(err);
+  } finally {
+    card.classList.remove('running');
+  }
+}
+
+function downloadCSV() {
+  let csv = "U Rank,Region,University,State,Track,US News Rank,P1,P2,P3,P4,P5,Total,Summary,Positive Flags,Negative Flags,Sources\n";
+  results.forEach(r => {
+    const total = (r.p1||0)+(r.p2||0)+(r.p3||0)+(r.p4||0)+(r.p5||0);
+    const pos = (r.positive_flags || []).join(' | ');
+    const neg = (r.negative_flags || []).join(' | ');
+    const srcs = (r.sources || []).map(s => s.url).join(' | ');
+    csv += `${r.rank},"${r.region}","${r.name}",${r.state},${r.track},"${r.usnews_rank}",${r.p1},${r.p2},${r.p3},${r.p4},${r.p5},${total},"${r.summary}","${pos}","${neg}","${srcs}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.setAttribute('href', url);
+  a.setAttribute('download', 'airedex_utrack_calibration.csv');
+  a.click();
+}
+
+init();
+</script>
+</body>
+</html>
