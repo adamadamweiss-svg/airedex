@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIREDEX™ Research Engine v2.1</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1B2A; --navy2: #162437; --navy3: #1E2F42;
+    --gold: #C9A84C; --gold2: #E8C96A;
+    --ice: #E8F0F7; --dim: #8BA3BA; --slate: #7A96B0;
+    --green: #2ECC71; --red: #E74C3C; --amber: #F39C12;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--navy); color: var(--ice); font-family: 'DM Sans', sans-serif; padding: 32px; min-height: 100vh; }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* HEADER */
+  .header-box { border-bottom: 1px solid rgba(201,168,76,0.3); padding-bottom: 20px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: var(--gold); }
+  .brand span { font-size: 12px; font-weight: 400; color: var(--dim); margin-left: 8px; }
+  .version-badge { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); border: 1px solid rgba(201,168,76,0.4); padding: 3px 8px; border-radius: 3px; }
+
+  /* SETUP PANEL */
+  .setup-panel { background: var(--navy2); padding: 20px 24px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 24px; }
+  .setup-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .field-group { display: flex; flex-direction: column; gap: 6px; }
+  .field-label { font-size: 11px; color: var(--dim); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; }
+  input[type="password"], input[type="file"] { background: #000; border: 1px solid rgba(201,168,76,0.5); color: #fff; padding: 10px 12px; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 13px; }
+  input[type="password"] { width: 320px; }
+  input[type="file"] { width: 260px; cursor: pointer; font-size: 12px; }
+  .file-status { font-size: 11px; color: var(--dim); margin-top: 4px; font-family: 'DM Mono', monospace; }
+  .file-status.loaded { color: var(--green); }
+
+  /* BUTTONS */
+  .btn { border: none; padding: 10px 20px; border-radius: 4px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .btn-primary { background: var(--gold); color: var(--navy); }
+  .btn-primary:hover:not(:disabled) { background: var(--gold2); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+  .btn-outline:hover:not(:disabled) { background: rgba(201,168,76,0.1); }
+  .btn-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+  .btn-green { background: var(--green); color: #000; }
+  .btn-green:hover { background: #27ae60; }
+  .btn-red { background: transparent; border: 1px solid var(--red); color: var(--red); }
+  .btn-red:hover { background: rgba(231,76,60,0.1); }
+
+  /* STATUS BAR */
+  .status-bar { background: var(--navy3); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 10px 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--dim); font-family: 'DM Mono', monospace; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); flex-shrink: 0; }
+  .status-dot.active { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 1.5s infinite; }
+  .status-dot.done { background: var(--green); }
+  .status-dot.error { background: var(--red); }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* SCHOOL GRID */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .card { background: var(--navy2); padding: 16px 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06); transition: border-color 0.3s; }
+  .card.running { border-color: var(--gold); box-shadow: 0 0 12px rgba(201,168,76,0.15); }
+  .card.done { border-color: rgba(46,204,113,0.4); }
+  .card.error { border-color: rgba(231,76,60,0.4); }
+  .card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+  .card-meta { font-size: 11px; color: var(--dim); font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 6px; }
+  .card-track { font-size: 10px; color: var(--gold); font-family: 'DM Mono', monospace; border: 1px solid rgba(201,168,76,0.3); padding: 1px 5px; border-radius: 3px; }
+  .card-score { font-size: 20px; font-family: 'DM Mono', monospace; color: var(--gold); font-weight: 500; margin-top: 8px; }
+  .card-score span { font-size: 11px; color: var(--dim); }
+  .new-badge { font-size: 10px; background: rgba(46,204,113,0.2); color: var(--green); border: 1px solid rgba(46,204,113,0.3); padding: 1px 6px; border-radius: 3px; font-family: 'DM Mono', monospace; }
+
+  /* CONFIRMATION PANEL */
+  .confirm-panel { background: var(--navy2); border: 1px solid rgba(201,168,76,0.4); border-radius: 8px; padding: 24px; margin-bottom: 28px; display: none; }
+  .confirm-panel.visible { display: block; }
+  .confirm-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; color: var(--gold); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .confirm-school { font-size: 18px; color: var(--ice); }
+  .diff-section { margin-bottom: 16px; }
+  .diff-label { font-size: 11px; color: var(--dim); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .diff-list { display: flex; flex-direction: column; gap: 4px; }
+  .diff-item { font-size: 13px; padding: 6px 10px; border-radius: 4px; font-family: 'DM Mono', monospace; line-height: 1.4; }
+  .diff-item.existing { background: rgba(139,163,186,0.1); color: var(--dim); }
+  .diff-item.new { background: rgba(46,204,113,0.1); color: var(--green); border-left: 2px solid var(--green); }
+  .diff-item.new::before { content: '+ '; }
+  .diff-item.flag { background: rgba(243,156,18,0.12); color: var(--amber); border-left: 2px solid var(--amber); font-size: 12px; }
+  .score-compare { display: flex; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
+  .score-box { background: var(--navy3); padding: 12px 16px; border-radius: 6px; text-align: center; min-width: 100px; }
+  .score-box-label { font-size: 10px; color: var(--dim); font-family: 'DM Mono', monospace; text-transform: uppercase; margin-bottom: 4px; }
+  .score-box-val { font-size: 24px; font-family: 'DM Mono', monospace; color: var(--ice); font-weight: 500; }
+  .score-box-val.changed { color: var(--gold); }
+  .confirm-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .pillar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
+  .pillar-box { background: var(--navy3); padding: 10px; border-radius: 4px; text-align: center; }
+  .pillar-name { font-size: 10px; color: var(--dim); font-family: 'DM Mono', monospace; margin-bottom: 4px; }
+  .pillar-val { font-size: 16px; font-family: 'DM Mono', monospace; color: var(--ice); }
+  .pillar-val.changed { color: var(--gold); }
+  .pillar-val.label { font-size: 12px; }
+  .pillar-old { font-size: 10px; color: var(--dim); font-family: 'DM Mono', monospace; text-decoration: line-through; }
+
+  /* EXPORT ROW */
+  .export-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 16px 20px; background: var(--navy2); border-radius: 8px; border: 1px solid rgba(46,204,113,0.3); }
+  .export-row.hidden { display: none; }
+  .export-label { font-size: 13px; color: var(--dim); font-family: 'DM Mono', monospace; flex: 1; }
+
+  /* LOW SCORE WARNING */
+  .low-score-warning { background: rgba(243,156,18,0.08); border: 1px solid rgba(243,156,18,0.4); border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; display: none; }
+  .low-score-warning.visible { display: block; }
+  .low-score-warning-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; color: var(--amber); margin-bottom: 8px; }
+  .low-score-warning ul { list-style: none; padding: 0; }
+  .low-score-warning li { font-size: 12px; color: var(--dim); font-family: 'DM Mono', monospace; padding: 3px 0; }
+  .low-score-warning li::before { content: '— '; color: var(--amber); }
+
+  /* PROGRESS */
+  .progress-wrap { background: rgba(255,255,255,0.06); border-radius: 4px; height: 4px; margin-top: 8px; overflow: hidden; }
+  .progress-bar { height: 100%; background: var(--gold); border-radius: 4px; transition: width 0.4s; width: 0%; }
+
+  /* DIVIDER */
+  .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 20px 0; }
+
+  .run-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header-box">
+    <div>
+      <div class="brand">AIREDEX™ <span>INTERNAL RESEARCH ENGINE</span></div>
+    </div>
+    <div class="version-badge">v2.1 · U TRACK CALIBRATION · claude-sonnet-4-20250514</div>
+  </div>
+
+  <!-- SETUP PANEL -->
+  <div class="setup-panel">
+    <div class="setup-row">
+      <div class="field-group">
+        <div class="field-label">Anthropic API Key</div>
+        <input type="password" id="apiKey" placeholder="sk-ant-...">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Load Existing CSV (optional)</div>
+        <input type="file" id="csvFile" accept=".csv" onchange="loadCSV(this)">
+        <div class="file-status" id="fileStatus">No file loaded — will start fresh</div>
+      </div>
+      <div class="field-group" style="justify-content: flex-end;">
+        <div class="field-label">&nbsp;</div>
+        <div class="run-controls">
+          <button class="btn btn-primary" onclick="runSelected()" id="runBtn">&#9654; Run Selected Schools</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div class="status-dot" id="globalDot"></div>
+    <div id="globalStatus">Ready. Load existing CSV to accumulate, or run fresh.</div>
+    <div style="margin-left: auto; font-size: 11px;" id="progressLabel"></div>
+  </div>
+  <div class="progress-wrap" style="margin-bottom: 20px;">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- SCHOOL GRID -->
+  <div class="grid" id="cardGrid"></div>
+
+  <!-- CONFIRMATION PANEL -->
+  <div class="confirm-panel" id="confirmPanel">
+    <div class="confirm-title">
+      <span>&#9888;</span>
+      <span>Review Changes: <span class="confirm-school" id="confirmSchoolName"></span></span>
+    </div>
+
+    <div class="score-compare" id="scoreCompare"></div>
+
+    <div class="pillar-grid" id="pillarGrid"></div>
+
+    <div class="diff-section" id="flagSection">
+      <div class="diff-label">Review Flags</div>
+      <div class="diff-list" id="flagDiff"></div>
+    </div>
+    <div class="diff-section" id="posSection">
+      <div class="diff-label">Positive Flags</div>
+      <div class="diff-list" id="posDiff"></div>
+    </div>
+    <div class="diff-section" id="negSection">
+      <div class="diff-label">Negative Flags</div>
+      <div class="diff-list" id="negDiff"></div>
+    </div>
+    <div class="diff-section" id="srcSection">
+      <div class="diff-label">Sources</div>
+      <div class="diff-list" id="srcDiff"></div>
+    </div>
+
+    <div class="confirm-actions">
+      <button class="btn btn-green" onclick="confirmAccept()">Accept &amp; Merge</button>
+      <button class="btn btn-red btn-outline" onclick="confirmSkip()">Skip This School</button>
+    </div>
+  </div>
+
+  <!-- LOW SCORE WARNING -->
+  <div class="low-score-warning" id="lowScoreWarning">
+    <div class="low-score-warning-title">&#9888; Schools scored below 30 — re-run recommended before export</div>
+    <ul id="lowScoreList"></ul>
+  </div>
+
+  <!-- EXPORT ROW -->
+  <div class="export-row hidden" id="exportRow">
+    <div class="export-label" id="exportLabel">Research complete.</div>
+    <button class="btn btn-outline" onclick="downloadCSV()">Download airedex_utrack_calibration.csv</button>
+  </div>
+
+</div>
+
+<script>
+// ─── UNIVERSITIES ────────────────────────────────────────────────────────────
+// Tracks: R = national research university (>20k undergrad, research-focused)
+//         UL = mid-size regional university (10k-20k undergrad)
+//         US = small regional university (<10k undergrad)
+const UNIVERSITIES = [
+  { rank:1, name:"Cal Poly San Luis Obispo",     state:"CA", track:"UL", category:"Regional University", region:"West",    usnews_rank:"#1 Regional West"    },
+  { rank:2, name:"Bentley University",           state:"MA", track:"US", category:"Regional University", region:"North",   usnews_rank:"#1 Regional North"   },
+  { rank:3, name:"Appalachian State University", state:"NC", track:"UL", category:"Regional University", region:"South",   usnews_rank:"#3 Regional South"   },
+  { rank:4, name:"Butler University",            state:"IN", track:"US", category:"Regional University", region:"Midwest", usnews_rank:"#1 Regional Midwest" },
+  { rank:5, name:"Elon University",              state:"NC", track:"US", category:"Regional University", region:"South",   usnews_rank:"~#8 Regional South"  }
+];
+
+// ─── RUBRIC DEFINITIONS ──────────────────────────────────────────────────────
+const RUBRICS = {
+  R: {
+    trackLabel: 'National University (R track)',
+    p1max: 40, p2max: 35, p3max: 13, p4max: 12,
+    p5note: 'Editorial label based on overall posture',
+    scoringItems: `
+P1 — INSTITUTIONAL COMMITMENT (max 40 pts)
+  1.1 Named AI institute/hub/center with own URL distinct from CS dept (partial=2)
+  1.2 University-wide AI governance body or council — cross-campus, named chair
+  1.3 Named dedicated AI executive role — CAIO, VP AI, Director of AI Integration
+  1.4 Published standalone AI strategic plan or formal AI principles doc (partial=3 if referenced in broader plan)
+  1.5 Dedicated AI funding line in budget or named AI endowment
+  1.6 Standalone undergrad AI major (announced/approved=3, enrolling=5)
+  1.7 Standalone AI grad degree or concentration (approved=2, enrolling=5)
+  1.8 Named AI ethics or responsible AI office/initiative
+
+P2 — CURRICULUM INTEGRATION (max 35 pts)
+  2.2 AI literacy requirement for all undergrads — named policy or gen-ed course
+  2.3 Standalone AI minor available to non-CS students
+  2.4 AI ethics named course or explicit curriculum requirement with course number (partial=3)
+  2.5 Campus-wide AI tool (licensed enterprise tool=5, built+hosted by institution=8)
+  2.6 Cross-disciplinary AI certificate open beyond STEM — named program with URL
+  2.7 Documented AI integration in at least 3 non-STEM departments
+
+P3 — INDUSTRY PARTNERSHIPS (max 13 pts)
+  3.1 Named AI industry partnership — named company + named agreement (research/curriculum=5, on-campus center=10)
+  3.2 Govt/federal AI partnership (named grant=3, lead institution=6, NSF AI Institute=10)
+  3.3 Dedicated AI career pipeline or employer AI recruiting program
+
+P4 — RESEARCH OUTPUT (max 12 pts)
+  4.1 Named AI research center/lab/institute — active projects, named PI, public URL (partial=4)
+  4.2 Published AI research — faculty-led, peer-reviewed, within 2 years
+  4.4 AI compute infrastructure — named HPC/GPU cluster available to students
+  4.6 Named AI fellowship, scholarship, or research award for students`
+  },
+
+  UL: {
+    trackLabel: 'Mid-size Regional University 10k-20k undergrad (U-L track)',
+    p1max: 35, p2max: 30, p3max: 20, p4max: 15,
+    p5note: 'Editorial label based on overall posture',
+    scoringItems: `
+P1 — INSTITUTIONAL COMMITMENT (max 35 pts)
+  1.1 (max 5) Named AI institute, hub, or center with own URL distinct from CS dept (partial=2)
+  1.2 (max 6) University-wide AI governance body or council — cross-campus, named chair
+  1.3 (max 6) Named dedicated AI executive role — CAIO, VP AI, Director of AI Integration (not a committee chair)
+  1.4 (max 8) Published standalone AI strategic plan or formal AI principles doc (partial=3 if referenced in broader plan)
+  1.6 (max 5) Standalone undergrad AI major (announced/approved=3, enrolling=5)
+  1.7 (max 5) Standalone AI grad degree or concentration (approved=2, enrolling=5)
+
+P2 — CURRICULUM INTEGRATION (max 30 pts)
+  2.4 (max 8) AI ethics named course or explicit curriculum requirement with course number (partial=3)
+  2.5 (max 8) Campus-wide AI tool (licensed enterprise tool=5, built+hosted by institution=8)
+  2.6 (max 7) Cross-disciplinary AI certificate open beyond STEM — named program with URL
+  2.8 (max 7) AI literacy initiative or campus-wide training program — formal ongoing, not a single workshop
+
+P3 — INDUSTRY PARTNERSHIPS (max 20 pts)
+  3.1 (max 10) Named AI industry partnership — named company + named agreement (research/curriculum=5, on-campus center=10)
+  3.2 (max 10) Govt/federal AI partnership (named grant=3, lead institution=6, NSF AI Institute=10)
+
+P4 — RESEARCH OUTPUT (max 15 pts)
+  4.1 (max 10) Named AI research center/lab/institute — active projects, named PI, public URL (partial=4)
+  4.5 (max 5) Applied AI research grant or funded project — any named public grant, no venue threshold`
+  },
+
+  US: {
+    trackLabel: 'Small University under 10k undergrad (U-S track)',
+    p1max: 35, p2max: 35, p3max: 10, p4max: 15,
+    p5note: 'Editorial label based on overall posture',
+    scoringItems: `
+P1 — INSTITUTIONAL COMMITMENT (max 35 pts)
+  1.1 (max 5) Named AI institute, hub, or center with own URL distinct from CS dept (partial=2)
+  1.2 (max 6) University-wide AI governance body or council — cross-campus, named chair
+  1.3 (max 6) Named dedicated AI executive role — CAIO, VP AI, Director of AI Integration (not a committee chair)
+  1.4 (max 8) Published standalone AI strategic plan or formal AI principles doc (partial=3 if referenced in broader plan)
+  1.6 (max 5) Standalone undergrad AI major (announced/approved=3, enrolling=5)
+  1.7 (max 5) Standalone AI grad degree or concentration (approved=2, enrolling=5)
+
+P2 — CURRICULUM INTEGRATION (max 35 pts)
+  2.4 (max 8) AI ethics named course or explicit curriculum requirement with course number (partial=3)
+  2.5 (max 8) Campus-wide AI tool (licensed enterprise tool=5, built+hosted by institution=8)
+  2.6 (max 9) Cross-disciplinary AI certificate open beyond STEM — named program with URL
+  2.8 (max 10) AI literacy initiative or campus-wide training program — formal ongoing, not a single workshop
+
+P3 — INDUSTRY PARTNERSHIPS (max 10 pts)
+  3.1 (max 10) Named AI industry partnership — named company + named agreement (research/curriculum=5, on-campus center=10)
+
+P4 — RESEARCH OUTPUT (max 15 pts)
+  4.1 (max 10) Named AI research center/lab/institute — active projects, named PI, public URL (partial=4)
+  4.5 (max 5) Applied AI research grant or funded project — any named public grant, no venue threshold`
+  }
+};
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let existingData = {};
+let finalData = {};
+let confirmQueue = [];
+let currentConfirm = null;
+let runDate = todayStr();
+
+function todayStr() {
+  return new Date().toISOString().slice(0,7);
+}
+
+function todayFull() {
+  return new Date().toISOString().slice(0,10);
+}
+
+// ─── CSV LOADER ──────────────────────────────────────────────────────────────
+function loadCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const text = e.target.result;
+      const rows = text.split('\n').filter(r => r.trim());
+      const dataRows = rows.filter(r => !r.startsWith('#') && !r.startsWith('AI Rank'));
+      let count = 0;
+      dataRows.forEach(row => {
+        const cols = parseCSVRow(row);
+        if (cols.length < 3) return;
+        const uniName = cols[2].replace(/"/g,'').trim();
+        if (!uniName) return;
+        existingData[uniName] = {
+          ai_rank:        cols[0],
+          app_rank:       cols[1],
+          name:           uniName,
+          state:          cols[3],
+          track:          cols[4],
+          p1:             parseFloat(cols[5])||0,
+          p1_conf:        cols[6],
+          p2:             parseFloat(cols[7])||0,
+          p2_conf:        cols[8],
+          p3:             parseFloat(cols[9])||0,
+          p3_conf:        cols[10],
+          p4:             parseFloat(cols[11])||0,
+          p4_conf:        cols[12],
+          p5:             cols[13] || '',       // label string, not a number
+          p5_conf:        cols[14],
+          total:          parseFloat(cols[15])||0,
+          tier:           cols[16],
+          summary:        cols[17],
+          pos_flags:      cols[18],
+          neg_flags:      cols[19],
+          research_notes: cols[20],
+          key_evidence:   cols[21],
+          notable_alumni: cols[22],
+          sources:        cols[23],
+          search_date:    cols[24],
+          newest_source:  cols[25],
+          freshness:      cols[26],
+          review_flags:   cols[27] || ''       // col index 27 (0-based)
+        };
+        count++;
+        finalData[uniName] = {...existingData[uniName]};
+      });
+      const el = document.getElementById('fileStatus');
+      el.textContent = `Loaded ${count} school records`;
+      el.className = 'file-status loaded';
+      setStatus(`Existing CSV loaded: ${count} schools. New findings will be merged.`, 'done');
+      init();
+    } catch(err) {
+      document.getElementById('fileStatus').textContent = 'Error reading file: ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+}
+
+function parseCSVRow(row) {
+  const cols = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < row.length; i++) {
+    const c = row[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { cols.push(cur); cur = ''; }
+    else { cur += c; }
+  }
+  cols.push(cur);
+  return cols;
+}
+
+// ─── INIT CARDS ──────────────────────────────────────────────────────────────
+function init() {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = '';
+  UNIVERSITIES.forEach((uni, i) => {
+    const existing = existingData[uni.name];
+    const scoreDisplay = existing ? `<div class="card-score">${existing.total} <span>/ 100</span></div>` : '';
+    grid.innerHTML += `
+      <div class="card" id="card-${i}" onclick="toggleCheck(${i})" style="cursor:pointer;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div class="card-name">${uni.name}</div>
+          <input type="checkbox" id="chk-${i}" checked
+            onclick="event.stopPropagation()" onchange="updateRunBtn()"
+            style="width:16px;height:16px;margin-top:3px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;">
+        </div>
+        <div class="card-meta">
+          <span class="status-dot" id="dot-${i}"></span>
+          <span id="txt-${i}">${existing ? 'Baseline loaded' : 'No baseline'}</span>
+          <span class="card-track">${uni.track}</span>
+        </div>
+        ${scoreDisplay}
+      </div>`;
+  });
+  updateRunBtn();
+}
+
+function toggleCheck(i) {
+  const chk = document.getElementById('chk-' + i);
+  if (chk && !chk.disabled) { chk.checked = !chk.checked; updateRunBtn(); }
+}
+
+function updateRunBtn() {
+  const count = UNIVERSITIES.filter((_, i) => document.getElementById('chk-' + i)?.checked).length;
+  const btn = document.getElementById('runBtn');
+  if (count === 0) {
+    btn.textContent = 'Select Schools to Run';
+    btn.disabled = true;
+  } else if (count === UNIVERSITIES.length) {
+    btn.innerHTML = '&#9654; Run All ' + count + ' Schools';
+    btn.disabled = false;
+  } else {
+    btn.innerHTML = '&#9654; Run Selected (' + count + ')';
+    btn.disabled = false;
+  }
+}
+
+// ─── RUN SELECTED ────────────────────────────────────────────────────────────
+async function runSelected() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) return alert('Please enter your API key.');
+  const selected = UNIVERSITIES.map((_, i) => i).filter(i => document.getElementById('chk-' + i)?.checked);
+  if (selected.length === 0) return alert('No schools selected.');
+  disableControls(true);
+  confirmQueue = [];
+  setStatus('Research engine running...', 'active');
+  for (let n = 0; n < selected.length; n++) {
+    updateProgress(n, selected.length);
+    await researchSchool(selected[n], key);
+    if (n < selected.length - 1) {
+      setStatus('Waiting 30s before next school...', 'active');
+      await new Promise(r => setTimeout(r, 30000));
+    }
+  }
+  updateProgress(selected.length, selected.length);
+  setStatus('Research complete. Review and confirm each school below.', 'done');
+  processConfirmQueue();
+}
+
+// ─── RESEARCH ONE SCHOOL ─────────────────────────────────────────────────────
+async function researchSchool(i, key) {
+  const uni = UNIVERSITIES[i];
+  const rubric = RUBRICS[uni.track];
+  const dot = document.getElementById(`dot-${i}`);
+  const txt = document.getElementById(`txt-${i}`);
+  const card = document.getElementById(`card-${i}`);
+
+  card.className = 'card running';
+  dot.className = 'status-dot active';
+  txt.textContent = 'Searching...';
+
+  const existing = existingData[uni.name];
+  const existingContext = existing
+    ? `EXISTING DATA FOR CONTEXT (do not simply repeat — search for NEW evidence to add or correct):
+Positive flags already known: ${existing.pos_flags}
+Negative flags already known: ${existing.neg_flags}
+Sources already found: ${existing.sources}
+Current scores: P1=${existing.p1}, P2=${existing.p2}, P3=${existing.p3}, P4=${existing.p4}, P5 posture=${existing.p5}`
+    : 'No existing data — perform comprehensive first-time research.';
+
+  const totalMax = rubric.p1max + rubric.p2max + rubric.p3max + rubric.p4max;
+
+  const prompt = `You are a research analyst for AIREDEX, an AI readiness ranking system for American universities.
+
+Perform thorough web research for ${uni.name} (${uni.state}) as of ${new Date().toLocaleDateString('en-US', {month:'long', year:'numeric'})}.
+
+This school is classified as: ${rubric.trackLabel}
+It is NOT a national research university. Focus on what regional schools actually have: applied AI programs, industry-facing partnerships, campus AI tools, and practical curriculum integration. Be appropriately skeptical — do not award points for vague or aspirational language. Award points only for named, verifiable programs with public URLs.
+
+${existingContext}
+
+SCORING RUBRIC (total max = ${totalMax} pts — P5 is a label, not scored):
+${rubric.scoringItems}
+
+P5 — A(I)ttitude (LABEL ONLY — not scored):
+Assign one of: leading edge / enabling / neutral / cautious / restrictive
+- Leading Edge: actively champions AI — published roadmap, CAIO-level role, public advocacy, institution out front on AI
+- Enabling: supportive and permissive — encourages AI use, positive policy stance, but not publicly out front
+- Neutral: no clear position — AI allowed but not encouraged, no formal policy either way
+- Cautious: some restrictions — unclear or inconsistent policy, case-by-case, hedging language
+- Restrictive: formal prohibitions, disciplinary history, or anti-AI leadership statements
+
+INSTRUCTIONS:
+1. Search specifically for evidence of each scoring item above
+2. Score conservatively — partial credit where noted, zero if no verifiable evidence
+3. Do not award points for: press releases without follow-through, single workshops, aspirational roadmap language, or CS department activity that is not university-wide
+4. For positive_flags and negative_flags: include confirmed items and tag new findings with [NEW ${todayFull()}]
+5. Sources: include existing sources plus new ones. Tag new sources with [NEW ${todayFull()}]
+6. No em dashes anywhere in your response
+
+REVIEW FLAGS — populate with specific editorial concerns:
+- Partial credit decisions the human reviewer should verify
+- Zero scores on high-value items (worth >= 5 pts) where evidence was ambiguous
+- Scoring uncertainty due to limited public information
+- Items where the evidence found may be outdated
+Format each flag as: [ITEM]: [issue]
+Example: 3.1 partial: Salesforce partnership scored 5pts — MOU language unclear, may warrant 0 | 4.1 zero: Applied AI Lab referenced in news but no public URL found — verify
+
+CRITICAL OUTPUT RULE: Return ONLY a valid JSON object. No preamble, no explanation, no markdown, no code fences. Start with { and end with }.
+
+{
+  "p1": <number 0-${rubric.p1max}>,
+  "p1_conf": "verified|inferred",
+  "p2": <number 0-${rubric.p2max}>,
+  "p2_conf": "verified|inferred",
+  "p3": <number 0-${rubric.p3max}>,
+  "p3_conf": "verified|inferred",
+  "p4": <number 0-${rubric.p4max}>,
+  "p4_conf": "verified|inferred",
+  "p5": "leading edge|enabling|neutral|cautious|restrictive",
+  "p5_conf": "verified|inferred",
+  "summary": "<2 sentence summary, no em dashes>",
+  "positive_flags": ["flag1", "flag2"],
+  "negative_flags": ["flag1", "flag2"],
+  "research_notes": "<detailed notes>",
+  "key_evidence": "<key evidence string>",
+  "sources": ["url1", "url2"],
+  "review_flags": ["[ITEM]: [issue]"]
+}`;
+
+  try {
+    // PASS 1: Web research
+    const researchResp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 4000,
+        tools: [{ type: "web_search_20250305", name: "web_search" }],
+        tool_choice: { type: "any" },
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const researchData = await researchResp.json();
+    if (researchData.error) throw new Error(researchData.error.message);
+
+    // Extract all usable text from Pass 1 — text blocks and web search tool_result content
+    const researchText = researchData.content.map(c => {
+      if (c.type === 'text') return c.text;
+      if (c.type === 'tool_result') {
+        return (c.content || []).filter(x => x.type === 'text').map(x => x.text).join('\n');
+      }
+      return '';
+    }).filter(Boolean).join('\n\n');
+    if (!researchText.trim()) {
+      console.warn('Pass 1 returned no extractable text for ' + uni.name);
+    }
+
+    // PASS 2: Clean JSON extraction
+    const rubric2 = RUBRICS[uni.track];
+    const jsonPrompt = `Based on this research about ${uni.name} (${rubric2.trackLabel}):
+
+${researchText}
+
+Return ONLY a valid JSON object with no preamble, no markdown, no explanation. Start with { and end with }.
+P5 must be a label string (leading edge/enabling/neutral/cautious/restrictive), not a number.
+review_flags must be an array of strings formatted as "[ITEM]: [issue]".
+
+{"p1":0,"p1_conf":"verified","p2":0,"p2_conf":"verified","p3":0,"p3_conf":"verified","p4":0,"p4_conf":"verified","p5":"neutral","p5_conf":"verified","summary":"","positive_flags":[],"negative_flags":[],"research_notes":"","key_evidence":"","sources":[],"review_flags":[]}`;
+
+    const jsonResp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 4000,
+        messages: [{ role: "user", content: jsonPrompt }]
+      })
+    });
+
+    const jsonData = await jsonResp.json();
+    if (jsonData.error) throw new Error(jsonData.error.message);
+
+    const rawText = jsonData.content.find(c => c.type === 'text')?.text || '{}';
+    const stripped = rawText.replace(/```json|```/g, '').trim();
+    const startIdx = stripped.indexOf('{');
+    const endIdx = stripped.lastIndexOf('}');
+    if (startIdx === -1) throw new Error('No JSON found in response');
+    const result = JSON.parse(stripped.substring(startIdx, endIdx + 1));
+
+    // P5 is a label — total is P1+P2+P3+P4 only
+    const total = (result.p1||0) + (result.p2||0) + (result.p3||0) + (result.p4||0);
+
+    confirmQueue.push({ uni, i, result, total, existing });
+
+    card.className = 'card done';
+    dot.className = 'status-dot done';
+    txt.textContent = `Score: ${total} — pending review`;
+
+    const scoreEl = card.querySelector('.card-score');
+    if (scoreEl) {
+      scoreEl.innerHTML = `${total} <span>/ 100</span>`;
+    } else {
+      card.innerHTML += `<div class="card-score">${total} <span>/ 100</span></div>`;
+    }
+
+    if (existing && total !== existing.total) {
+      const badge = document.createElement('span');
+      badge.className = 'new-badge';
+      badge.textContent = total > existing.total ? `+${total - existing.total}` : `${total - existing.total}`;
+      card.querySelector('.card-meta').appendChild(badge);
+    }
+
+  } catch(err) {
+    card.className = 'card error';
+    dot.className = 'status-dot error';
+    txt.textContent = 'Error: ' + err.message.substring(0, 60);
+    console.error(uni.name, err);
+  }
+}
+
+// ─── CONFIRMATION FLOW ────────────────────────────────────────────────────────
+function processConfirmQueue() {
+  if (confirmQueue.length === 0) {
+    document.getElementById('confirmPanel').classList.remove('visible');
+    checkLowScores();
+    showExportRow();
+    disableControls(false);
+    return;
+  }
+  currentConfirm = confirmQueue.shift();
+  showConfirmPanel(currentConfirm);
+}
+
+function showConfirmPanel(item) {
+  const { uni, result, total, existing } = item;
+  const rubric = RUBRICS[uni.track];
+  const panel = document.getElementById('confirmPanel');
+  panel.classList.add('visible');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  document.getElementById('confirmSchoolName').textContent = `${uni.name} (${uni.track})`;
+
+  // Score compare — P5 is a label so show separately
+  const scoreHTML = `
+    <div class="score-box">
+      <div class="score-box-label">Previous Total</div>
+      <div class="score-box-val">${existing ? existing.total : '--'}</div>
+    </div>
+    <div class="score-box">
+      <div class="score-box-label">New Total</div>
+      <div class="score-box-val ${existing && total !== existing.total ? 'changed' : ''}">${total}</div>
+    </div>
+    <div class="score-box">
+      <div class="score-box-label">A(I)ttitude</div>
+      <div class="score-box-val" style="font-size:14px;padding-top:4px;">${result.p5 || '--'}</div>
+    </div>`;
+  document.getElementById('scoreCompare').innerHTML = scoreHTML;
+
+  // Pillar compare — P5 shows label not number
+  const pillars = [
+    {label:'P1 Commit',    max: rubric.p1max, key:'p1', isLabel: false},
+    {label:'P2 Curric',    max: rubric.p2max, key:'p2', isLabel: false},
+    {label:'P3 Partner',   max: rubric.p3max, key:'p3', isLabel: false},
+    {label:'P4 Research',  max: rubric.p4max, key:'p4', isLabel: false},
+    {label:'P5 A(I)ttitude', max: null,       key:'p5', isLabel: true}
+  ];
+  let pillarHTML = '';
+  pillars.forEach(p => {
+    const newVal = result[p.key] ?? '';
+    const oldVal = existing ? (existing[p.key] ?? null) : null;
+    const changed = oldVal !== null && String(newVal) !== String(oldVal);
+    if (p.isLabel) {
+      pillarHTML += `<div class="pillar-box">
+        <div class="pillar-name">${p.label}</div>
+        <div class="pillar-val label ${changed ? 'changed' : ''}">${newVal || '--'}</div>
+        ${changed ? `<div class="pillar-old">${oldVal}</div>` : ''}
+      </div>`;
+    } else {
+      pillarHTML += `<div class="pillar-box">
+        <div class="pillar-name">${p.label}</div>
+        <div class="pillar-val ${changed ? 'changed' : ''}">${newVal}<span style="font-size:10px;color:var(--dim)">/${p.max}</span></div>
+        ${changed ? `<div class="pillar-old">${oldVal}</div>` : ''}
+      </div>`;
+    }
+  });
+  document.getElementById('pillarGrid').innerHTML = pillarHTML;
+
+  // Review flags
+  const flags = result.review_flags || [];
+  const flagContainer = document.getElementById('flagDiff');
+  document.getElementById('flagSection').style.display = flags.length > 0 ? 'block' : 'none';
+  flagContainer.innerHTML = flags.length > 0
+    ? flags.map(f => `<div class="diff-item flag">&#9872; ${escapeHTML(f)}</div>`).join('')
+    : '';
+
+  // Flags diff
+  renderDiff('posDiff', existing ? splitPipe(existing.pos_flags) : [], result.positive_flags || []);
+  renderDiff('negDiff', existing ? splitPipe(existing.neg_flags) : [], result.negative_flags || []);
+  renderDiff('srcDiff', existing ? splitPipe(existing.sources) : [], result.sources || []);
+}
+
+function splitPipe(str) {
+  if (!str) return [];
+  return str.split('|').map(s => s.trim()).filter(Boolean);
+}
+
+function renderDiff(containerId, existingItems, newItems) {
+  const container = document.getElementById(containerId);
+  let html = '';
+  existingItems.forEach(item => {
+    const isAlreadyInNew = newItems.some(n => n.replace(/\[NEW [^\]]+\]/,'').trim().toLowerCase() === item.replace(/\[NEW [^\]]+\]/,'').trim().toLowerCase());
+    if (!isAlreadyInNew) {
+      html += `<div class="diff-item existing">${escapeHTML(item)}</div>`;
+    }
+  });
+  newItems.forEach(item => {
+    const isTaggedNew = item.includes('[NEW ');
+    const existingMatch = existingItems.some(e => e.replace(/\[NEW [^\]]+\]/,'').trim().toLowerCase() === item.replace(/\[NEW [^\]]+\]/,'').trim().toLowerCase());
+    if (isTaggedNew || !existingMatch) {
+      html += `<div class="diff-item new">${escapeHTML(item)}</div>`;
+    } else {
+      html += `<div class="diff-item existing">${escapeHTML(item)}</div>`;
+    }
+  });
+  container.innerHTML = html || '<div style="font-size:12px;color:var(--dim);padding:6px 10px;">No items</div>';
+}
+
+function escapeHTML(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function confirmAccept() {
+  const { uni, result, total, existing, i } = currentConfirm;
+
+  const mergedPos = mergePipeField(existing?.pos_flags, result.positive_flags);
+  const mergedNeg = mergePipeField(existing?.neg_flags, result.negative_flags);
+  const mergedSrc = mergePipeField(existing?.sources, result.sources);
+  const mergedFlags = (result.review_flags || []).join(' | ');
+
+  const tier = calcTier(total, uni.track);
+  const appRank = existing?.app_rank || uni.rank;
+
+  finalData[uni.name] = {
+    ai_rank:        existing?.ai_rank || uni.rank,
+    app_rank:       appRank,
+    name:           uni.name,
+    state:          uni.state,
+    track:          uni.track,
+    p1:             result.p1,
+    p1_conf:        result.p1_conf || 'verified',
+    p2:             result.p2,
+    p2_conf:        result.p2_conf || 'verified',
+    p3:             result.p3,
+    p3_conf:        result.p3_conf || 'verified',
+    p4:             result.p4,
+    p4_conf:        result.p4_conf || 'verified',
+    p5:             result.p5 || 'neutral',          // label: leading edge / enabling / neutral / cautious / restrictive
+    p5_conf:        result.p5_conf || 'verified',
+    total:          total,
+    tier:           tier,
+    summary:        result.summary || existing?.summary || '',
+    pos_flags:      mergedPos,
+    neg_flags:      mergedNeg,
+    research_notes: result.research_notes || existing?.research_notes || '',
+    key_evidence:   result.key_evidence || existing?.key_evidence || '',
+    notable_alumni: existing?.notable_alumni || '',
+    sources:        mergedSrc,
+    search_date:    runDate,
+    newest_source:  runDate,
+    freshness:      'green',
+    review_flags:   mergedFlags
+  };
+
+  document.getElementById(`txt-${i}`).textContent = `Confirmed: ${total}`;
+  document.getElementById(`card-${i}`).className = 'card done';
+  currentConfirm = null;
+  processConfirmQueue();
+}
+
+function confirmSkip() {
+  const { uni, existing, i } = currentConfirm;
+  if (existing) finalData[uni.name] = { ...existing };
+  document.getElementById(`txt-${i}`).textContent = 'Skipped';
+  currentConfirm = null;
+  processConfirmQueue();
+}
+
+function mergePipeField(existingStr, newArray) {
+  const existing = splitPipe(existingStr);
+  const combined = [...existing];
+  (newArray || []).forEach(item => {
+    const clean = item.replace(/\[NEW [^\]]+\]/,'').trim().toLowerCase();
+    const alreadyExists = combined.some(e => e.replace(/\[NEW [^\]]+\]/,'').trim().toLowerCase() === clean);
+    if (!alreadyExists) combined.push(item);
+  });
+  return combined.join(' | ');
+}
+
+function calcTier(total, track) {
+  if (track === 'R') {
+    if (total >= 90) return 'S';
+    if (total >= 75) return 'A';
+    if (total >= 60) return 'B';
+    if (total >= 45) return 'C';
+    return 'D';
+  } else {
+    // U-L and U-S share same tier thresholds for now
+    if (total >= 80) return 'S';
+    if (total >= 63) return 'A';
+    if (total >= 48) return 'B';
+    if (total >= 33) return 'C';
+    return 'D';
+  }
+}
+
+// ─── LOW SCORE CHECK ─────────────────────────────────────────────────────────
+function checkLowScores() {
+  const below = Object.values(finalData).filter(r => (r.total || 0) < 30);
+  const warning = document.getElementById('lowScoreWarning');
+  const list = document.getElementById('lowScoreList');
+  if (below.length > 0) {
+    list.innerHTML = below.map(r => `<li>${r.name} — ${r.total} pts (${r.track})</li>`).join('');
+    warning.classList.add('visible');
+  } else {
+    warning.classList.remove('visible');
+  }
+}
+
+// ─── EXPORT ──────────────────────────────────────────────────────────────────
+function showExportRow() {
+  const row = document.getElementById('exportRow');
+  row.classList.remove('hidden');
+  const confirmed = Object.keys(finalData).length;
+  document.getElementById('exportLabel').textContent = `${confirmed} school records ready to export.`;
+}
+
+function downloadCSV() {
+  const COMMENT = '# A(I)ttitude: leading edge / enabling / neutral / cautious / restrictive — label only, not scored | Tracks: R=National University UL=Mid-size Regional 10k-20k US=Small Regional under 10k';
+  const HEADER = 'AI Rank,App Rank,University,State,Track,P1 Commitment,P1 Conf,P2 Curriculum,P2 Conf,P3 Partnerships,P3 Conf,P4 Research,P4 Conf,P5 A(I)ttitude,P5 Conf,Total Score,Tier,Summary,Positive Flags,Negative Flags,Research Notes,Key Evidence,Notable Alumni,Sources,Search Date,Newest Source,Freshness,Review Flags';
+
+  const sorted = Object.values(finalData).sort((a,b) => (b.total||0)-(a.total||0));
+  sorted.forEach((row, idx) => { row.ai_rank = idx + 1; });
+
+  let csv = COMMENT + '\n' + HEADER + '\n';
+  sorted.forEach(r => {
+    const flags = r.review_flags || '';
+    const fields = [
+      r.ai_rank, r.app_rank, q(r.name), r.state, r.track,
+      r.p1, r.p1_conf, r.p2, r.p2_conf, r.p3, r.p3_conf,
+      r.p4, r.p4_conf, q(r.p5), r.p5_conf, r.total, r.tier,
+      q(r.summary), q(r.pos_flags), q(r.neg_flags),
+      q(r.research_notes), q(r.key_evidence), q(r.notable_alumni||''),
+      q(r.sources), r.search_date, r.newest_source, r.freshness,
+      q(flags)
+    ];
+    csv += fields.join(',') + '\n';
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'airedex_utrack_calibration.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function q(val) {
+  if (val === null || val === undefined) return '""';
+  return '"' + String(val).replace(/"/g, '""') + '"';
+}
+
+// ─── UTILITIES ───────────────────────────────────────────────────────────────
+function setStatus(msg, state) {
+  document.getElementById('globalStatus').textContent = msg;
+  const dot = document.getElementById('globalDot');
+  dot.className = 'status-dot' + (state ? ' ' + state : '');
+}
+
+function updateProgress(done, total) {
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = done > 0 ? `${done} / ${total}` : '';
+}
+
+function disableControls(disabled) {
+  document.getElementById('runBtn').disabled = disabled;
+  UNIVERSITIES.forEach((_, i) => { const chk = document.getElementById('chk-' + i); if (chk) chk.disabled = disabled; });
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
