@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Methodology | AIREDEX&#8482; AI Readiness Index</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #0D1B2A;
+    --navy2:  #162437;
+    --gold:   #C9A84C;
+    --gold2:  #E8C96A;
+    --ice:    #E8F0F7;
+    --dim:    #8BA3BA;
+    --slate:  #7A96B0;
+    --green:  #2ECC71;
+    --amber:  #F39C12;
+    --red:    #E74C3C;
+    --border: rgba(201,168,76,0.2);
+    --card:   #13202F;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--navy);
+    color: var(--ice);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -5%, rgba(201,168,76,0.06) 0%, transparent 65%),
+      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,0.012) 59px, rgba(255,255,255,0.012) 60px),
+      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.012) 59px, rgba(255,255,255,0.012) 60px);
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 48px;
+    background: rgba(13,27,42,0.96);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 34px; height: 34px;
+    border: 1.5px solid var(--gold); border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 12px; color: var(--gold);
+  }
+  .logo-text {
+    font-weight: 700; font-size: 14px;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--ice);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .beta-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; padding: 2px 6px;
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 3px; color: var(--gold);
+    background: rgba(201,168,76,0.08);
+    letter-spacing: 0.08em;
+  }
+  .logo-sub {
+    font-size: 9px; color: var(--dim);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em; margin-top: 1px;
+  }
+  nav { display: flex; gap: 28px; align-items: center; }
+  nav a {
+    font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ice); text-decoration: none; transition: color 0.2s;
+  }
+  nav a:hover { color: #fff; }
+  nav a.active { color: var(--gold); }
+  .nav-coming-soon { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(139,163,186,0.55); cursor: default; display: flex; align-items: center; gap: 6px; }
+  .nav-cs-badge { font-family: 'DM Mono', monospace; font-size: 8px; padding: 1px 5px; border: 1px solid rgba(139,163,186,0.35); border-radius: 3px; color: rgba(139,163,186,0.55); letter-spacing: 0.08em; }
+
+  /* ── HERO ── */
+  .page-hero {
+    max-width: 760px; margin: 0 auto;
+    padding: 64px 24px 48px;
+    text-align: center;
+  }
+  .page-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 18px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .page-eyebrow::before, .page-eyebrow::after {
+    content: ''; display: block; width: 28px; height: 1px;
+    background: var(--gold); opacity: 0.4;
+  }
+  .page-hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 4vw, 46px);
+    line-height: 1.1; font-weight: 400; color: #fff;
+    margin-bottom: 16px;
+  }
+  .page-hero h1 em { font-style: italic; color: var(--gold2); }
+  .page-hero p {
+    font-size: 14px; color: var(--ice);
+    line-height: 1.8; font-family: 'DM Mono', monospace;
+    max-width: 540px; margin: 0 auto;
+  }
+
+  /* ── CONTENT ── */
+  .content {
+    max-width: 780px; margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    margin: 48px 0;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 14px;
+  }
+
+  h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px; font-weight: 400; color: #fff;
+    margin-bottom: 14px; line-height: 1.2;
+  }
+
+  h3 {
+    font-size: 14px; font-weight: 700; color: var(--ice);
+    margin-bottom: 10px; letter-spacing: 0.02em;
+  }
+
+  p {
+    font-size: 14px; color: var(--ice);
+    line-height: 1.85; margin-bottom: 16px;
+    font-family: 'DM Mono', monospace; font-weight: 400;
+  }
+
+  p strong { color: var(--ice); font-weight: 500; }
+
+  /* ── PILLARS ── */
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px; margin: 28px 0;
+  }
+
+  .pillar-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px; padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .pillar-card:hover { border-color: var(--border); }
+
+  .pillar-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 8px;
+  }
+  .pillar-name {
+    font-size: 14px; font-weight: 700; color: #fff;
+    margin-bottom: 8px;
+  }
+  .pillar-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px; color: var(--ice);
+    line-height: 1.7; margin: 0;
+  }
+
+  .pillar-card.attitude {
+    grid-column: 1 / -1;
+    background: rgba(201,168,76,0.06);
+    border-color: rgba(201,168,76,0.2);
+  }
+  .pillar-card.attitude .pillar-name { color: var(--gold2); }
+
+  /* ── TIERS TABLE ── */
+  .tiers-table {
+    width: 100%; border-collapse: collapse;
+    margin: 20px 0; font-family: 'DM Mono', monospace;
+  }
+  .tiers-table th {
+    font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gold); padding: 10px 14px;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    text-align: left;
+  }
+  .tiers-table td {
+    font-size: 12px; color: var(--ice);
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .tiers-table tr:last-child td { border-bottom: none; }
+  .tier-badge {
+    display: inline-block;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 4px;
+  }
+  .t-s { background: rgba(241,196,15,0.15); color: #F1C40F; }
+  .t-a { background: rgba(46,204,113,0.12); color: #2ECC71; }
+  .t-b { background: rgba(52,152,219,0.12); color: #3498DB; }
+  .t-c { background: rgba(243,156,18,0.12); color: #F39C12; }
+  .t-d { background: rgba(231,76,60,0.12);  color: #E74C3C; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    background: var(--card);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 20px; margin: 24px 0;
+  }
+  .callout p { margin: 0; color: var(--ice); }
+
+  /* ── CONTACT FORM ── */
+  .contact-section {
+    background: var(--navy2);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 36px 32px;
+    margin-top: 48px;
+  }
+  .contact-section h2 { margin-bottom: 8px; }
+  .contact-section > p { margin-bottom: 24px; }
+
+  .form-row { display: flex; gap: 12px; margin-bottom: 12px; }
+  .form-input {
+    flex: 1; padding: 11px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px; font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ice); outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input::placeholder { color: var(--slate); }
+  .form-input:focus { border-color: var(--gold); }
+  .form-select {
+    flex: 1; padding: 11px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px; font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    color: var(--slate); outline: none;
+  }
+  .form-select option { background: var(--navy2); color: var(--ice); }
+  .form-textarea {
+    width: 100%; padding: 11px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px; font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ice); outline: none;
+    transition: border-color 0.2s;
+    resize: vertical; min-height: 90px;
+    margin-bottom: 12px;
+  }
+  .form-textarea::placeholder { color: var(--slate); }
+  .form-textarea:focus { border-color: var(--gold); }
+  .form-btn {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border: none; border-radius: 8px; cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--navy); transition: opacity 0.2s;
+  }
+  .form-btn:hover { opacity: 0.9; }
+  .form-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; color: var(--slate);
+    margin-top: 10px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy); border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 24px 48px; font-family: 'DM Mono', monospace;
+    font-size: 10px; color: var(--slate); letter-spacing: 0.05em;
+  }
+  .footer-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 32px; margin-bottom: 16px; }
+  .footer-legal { display: flex; flex-direction: column; gap: 6px; max-width: 680px; }
+  .footer-legal div { font-size: 9px; line-height: 1.6; opacity: 0.7; }
+  .footer-nav { display: flex; gap: 24px; flex-shrink: 0; }
+  .footer-copy { border-top: 1px solid rgba(255,255,255,0.04); padding-top: 14px; font-size: 9px; opacity: 0.5; }
+  footer a { color: var(--slate); text-decoration: none; }
+  footer a:hover { color: var(--ice); }
+
+  /* HAMBURGER */
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
+  .hamburger span { display: block; width: 22px; height: 2px; background: var(--ice); border-radius: 2px; transition: all 0.25s; }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-nav {
+    display: none;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--navy2);
+    z-index: 99;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+  }
+  .mobile-nav.open { display: flex; }
+  .mobile-nav a, .mobile-nav .mobile-nav-coming {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ice); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .mobile-nav a:hover { color: var(--gold); }
+  .mobile-nav .mobile-nav-coming { color: rgba(139,163,186,0.5); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .mobile-nav .mobile-nav-cs-badge { font-family: 'DM Mono', monospace; font-size: 10px; padding: 2px 8px; border: 1px solid rgba(139,163,186,0.3); border-radius: 3px; color: rgba(139,163,186,0.5); letter-spacing: 0.1em; }
+  .mobile-nav-close { position: absolute; top: 20px; right: 24px; background: none; border: none; cursor: pointer; padding: 4px; }
+  .mobile-nav-close span { display: block; width: 22px; height: 2px; background: var(--ice); border-radius: 2px; }
+  .mobile-nav-close span:nth-child(1) { transform: translateY(1px) rotate(45deg); }
+  .mobile-nav-close span:nth-child(2) { transform: translateY(-1px) rotate(-45deg); }
+
+  @media (max-width: 640px) {
+    header { padding: 14px 20px; }
+    nav { display: none; }
+    .hamburger { display: flex; }
+    .page-hero { padding: 48px 16px 36px; }
+    .content { padding: 0 16px 48px; }
+    .pillars-grid { grid-template-columns: 1fr; }
+    .pillar-card.attitude { grid-column: 1; }
+    .form-row { flex-direction: column; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">AI</div>
+    <div>
+      <div class="logo-text"><a href="index.html" style="color:inherit;text-decoration:none">AIREDEX&#8482;</a> <span class="beta-badge">BETA</span></div>
+      <div class="logo-sub">AI Readiness Index</div>
+    </div>
+  </div>
+  <nav>
+    <span class="nav-coming-soon">Lists <span class="nav-cs-badge">Coming Soon</span></span>
+    <a href="#" class="active">Methodology</a>
+    <a href="mailto:press@airedex.com">Contact</a>
+  </nav>
+  <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-close" onclick="toggleMobileNav()" aria-label="Close menu">
+    <span></span><span></span>
+  </button>
+  <span class="mobile-nav-coming">Lists <span class="mobile-nav-cs-badge">Coming Soon</span></span>
+  <a href="#" onclick="toggleMobileNav()">Methodology</a>
+  <a href="mailto:press@airedex.com" onclick="toggleMobileNav()">Contact</a>
+</div>
+
+<div class="page-hero">
+  <div class="page-eyebrow">Our Approach</div>
+  <h1>How we score <em>AI readiness</em><br>in higher education</h1>
+</div>
+
+<div class="content">
+
+  <!-- HOW IT WORKS -->
+  <div class="section-label">The Research Process</div>
+  <h2>Independent, Evidence-Based Research</h2>
+  <p>AIREDEX&#8482; scores are the product of multi-layered research conducted by our team, assisted by advanced AI research tools. We draw on a wide range of publicly available information from a wide range of sources, including institutional announcements, academic program data, research publications, industry partnerships, and policy disclosures. This helps us build a comprehensive picture of each school's AI readiness.</p>
+  <p>We refresh our research on a regular basis to keep our scores relevant. This helps us track new mandates, partnerships, and progress that schools make on an ongoing basis. The best way to stay current on the schools you care about is to subscribe to AIREDEX&#8482; updates -- we'll notify you when a school you're interested in makes progress, and when new schools are added to our ratings.</p>
+
+  <div class="callout">
+    <p>AIREDEX&#8482; is an independent organization. We are not affiliated with, sponsored by, or endorsed by any college or university.</p>
+  </div>
+
+  <hr class="divider">
+
+  <!-- FIVE PILLARS -->
+  <div class="section-label">Scoring Framework</div>
+  <h2>Five pillars of AI readiness</h2>
+  <p>AIREDEX&#8482; uses a proprietary system to evaluate the AI readiness of every college and university we score. This system measures five distinct aspects of each school's approach to AI, which we break into specific 'pillars,' each described below.</p>
+
+  <div class="pillars-grid">
+
+    <div class="pillar-card">
+      <div class="pillar-number">Pillar 01</div>
+      <div class="pillar-name">Institutional Commitment</div>
+      <p class="pillar-desc">Has institutional leadership made AI a stated priority? Where we find evidence of dedicated AI leadership roles, AI-specific strategic planning, meaningful resource allocation, and AI infrastructure embedded across the entirety of the school, we are able to evaluate the depth of that commitment -- and distinguish genuine investment from a short-term response to trends.</p>
+    </div>
+
+    <div class="pillar-card">
+      <div class="pillar-number">Pillar 02</div>
+      <div class="pillar-name">Curriculum Integration</div>
+      <p class="pillar-desc">Curriculum is where AI readiness has its most direct impact on the student -- in many ways on a par with institutional commitment itself. A school should be incorporating AI across disciplines, not just within computer science. We look for AI integration across majors including Business, Law, Public Policy, Humanities, and other fields -- because the AI revolution will reshape every profession, not just the ones that write code.</p>
+    </div>
+
+    <div class="pillar-card">
+      <div class="pillar-number">Pillar 03</div>
+      <div class="pillar-name">Industry Partnerships</div>
+      <p class="pillar-desc">Many schools form partnerships with public and private tech companies to advance AI research, develop curriculum, and build shared infrastructure. When we find evidence of these relationships, it sends a strong signal that the institution is actively engaged with the industry -- which can pay real dividends for students in the form of internship pipelines, recruiting access, and exposure to real-world AI work before graduation.</p>
+    </div>
+
+    <div class="pillar-card">
+      <div class="pillar-number">Pillar 04</div>
+      <div class="pillar-name">Research Depth & Access</div>
+      <p class="pillar-desc">A university's research output is one of the clearest indicators of how seriously it takes any academic discipline -- and AI is no exception. A school associated with cutting edge AI research signals to the broader industry that AI is taken seriously there -- which can reflect positively on its graduates. We also look for evidence that undergraduates have genuine access to that research environment.</p>
+    </div>
+
+    <div class="pillar-card attitude">
+      <div class="pillar-number">Pillar 05</div>
+      <div class="pillar-name">A(I)ttitude&#8482;</div>
+      <p class="pillar-desc">Every institution has a stance toward AI, whether they have articulated it or not. Some are leaning in aggressively, integrating AI across academics, operations, and strategy, while others may be just starting to explore AI. Our proprietary metric, A(I)ttitude&#8482;, helps capture that posture across multiple data points and our other scored pillars. Our five designations distill a lot of analysis into sentiments that are easy to understand at a glance.</p>
+    </div>
+
+  </div>
+
+  <hr class="divider">
+
+  <!-- INSTITUTIONAL CLASSIFICATION -->
+  <div class="section-label">Fair Comparison</div>
+  <h2>We don't compare apples to oranges</h2>
+  <p>Scoring a small liberal arts college against a major research university on the same absolute scale would be unfair, and misleading. A school with 1,800 undergraduates cannot be expected to have the same AI infrastructure as an institution with 50,000 students and a multi-million dollar research budget.</p>
+  <p>AIREDEX&#8482; classifies each institution we evaluate into one of three cohorts based on undergraduate enrollment size. Students considering a small college with a few thousand undergraduates should have different expectations for AI infrastructure and resources than students looking at a flagship research university enrolling 50,000. Every school is measured against peers of comparable scale, so that prospective students and applicants can better evaluate whether the school they are interested in is genuinely preparing them for a world where AI fluency will impact their career outcomes.</p>
+
+  <hr class="divider">
+
+  <!-- TIER SYSTEM -->
+  <div class="section-label">Scoring Scale</div>
+  <h2>What the tiers mean</h2>
+  <p>AIREDEX&#8482; scores each institution on a scale of 0-100. We then combine those scores with our broader analysis to assign a tier designation, helping prospective students quickly understand where a school stands relative to its peers. Tier thresholds are calibrated separately for each of the three AIREDEX&#8482; cohorts -- large research universities, mid-size regionals, and smaller institutions -- to account for the different standards and expectations appropriate to each.</p>
+
+  <table class="tiers-table">
+    <thead>
+      <tr>
+        <th>Tier</th>
+        <th>Label</th>
+        <th>What it means</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="tier-badge t-s">S</span></td>
+        <td style="color:var(--ice)">Elite</td>
+        <td>Leading edge AI readiness. Significant institutional commitment, cross-disciplinary integration, and active industry engagement are all evident, making this institution a leader in its class.</td>
+      </tr>
+      <tr>
+        <td><span class="tier-badge t-a">A</span></td>
+        <td style="color:var(--ice)">Exceptional</td>
+        <td>Meaningful AI investment is underway and commitment to AI is evident throughout the institution. While some gaps may appear, this institution is among the leaders in AI readiness.</td>
+      </tr>
+      <tr>
+        <td><span class="tier-badge t-b">B</span></td>
+        <td style="color:var(--ice)">Strong</td>
+        <td>AI readiness is evident, with meaningful involvement across multiple departments. Integration may be incomplete, but the trend toward AI readiness is positive, putting this institution on a strong path to AI leadership.</td>
+      </tr>
+      <tr>
+        <td><span class="tier-badge t-c">C</span></td>
+        <td style="color:var(--ice)">Good</td>
+        <td>Emerging AI activity is evident, but it lacks scale or material institutional backing. This institution needs to increase its commitment and resources to put it on a path to AI readiness.</td>
+      </tr>
+      <tr>
+        <td><span class="tier-badge t-d">D</span></td>
+        <td style="color:var(--ice)">Limited</td>
+        <td>Little evidence of AI activity has been identified at this institution. This may reflect a negative posture toward AI, or inaction due to lack of resources or focus.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr class="divider">
+
+  <!-- DATA & TRANSPARENCY -->
+  <div class="section-label">Transparency</div>
+  <h2>Showing Our Work</h2>
+  <p>While our research process and algorithms are proprietary, we make a point of publishing our key findings directly on each school's profile -- including positive signals, areas of concern, and the sources that informed our analysis.</p>
+
+  <hr class="divider">
+
+  <!-- CONTACT FORM -->
+  <div class="contact-section" id="contact">
+    <div class="section-label">Get In Touch</div>
+    <h2>Questions About a Score?</h2>
+    <p>If you represent a college or university and have questions about your AIREDEX&#8482; score, or believe our research is missing key information, we welcome your outreach. We review all institutional inquiries and will respond within two business days.</p>
+
+    <div class="form-row">
+      <input class="form-input" type="text" placeholder="Your name" />
+      <input class="form-input" type="email" placeholder="your@email.com" />
+    </div>
+    <div class="form-row">
+      <input class="form-input" type="text" placeholder="Institution or organization" />
+      <select class="form-select">
+        <option value="" disabled selected>I am a...</option>
+        <option>University / College administrator</option>
+        <option>College counselor</option>
+        <option>Independent consultant</option>
+        <option>Journalist / Researcher</option>
+        <option>Parent or student</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <textarea class="form-textarea" placeholder="Your message..."></textarea>
+    <button class="form-btn">Send Message</button>
+    <div class="form-note">We typically respond within 2 business days.</div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-legal">
+      <div>AIREDEX&#8482; scores, rankings, tier designations, and methodology are proprietary. No score, ranking, or AIREDEX&#8482; designation may be reproduced, republished, or referenced in any commercial or institutional context without prior written permission. For licensing and press use, contact <a href="mailto:press@airedex.com">press@airedex.com</a>.</div>
+      <div>AIREDEX&#8482; scores are independent assessments based on publicly available information. No institution has paid for or influenced any score.</div>
+      <div>AIREDEX&#8482; scores are based solely on publicly available information at the time of research. We make every effort to identify relevant developments, but cannot guarantee completeness. Scores may not reflect recent announcements, unpublished initiatives, or information not accessible through public sources.</div>
+    </div>
+    <div class="footer-nav">
+      <a href="#">Methodology</a>
+      <a href="mailto:press@airedex.com">Contact</a>
+    </div>
+  </div>
+  <div class="footer-copy">&#169; 2026 AIREDEX&#8482; &middot; AI Readiness Index &middot; All rights reserved.</div>
+</footer>
+
+<script>
+function toggleMobileNav() {
+  const nav = document.getElementById('mobileNav');
+  const btn = document.getElementById('hamburger');
+  const open = nav.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+</script>
+</body>
+</html>
